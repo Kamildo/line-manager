@@ -1,12 +1,18 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
   templateUrl: './app.html',
-  styleUrl: './app.scss',
+  styleUrl: './app.scss'
 })
 export class App {
-  protected readonly title = signal('frontend');
+  apiStatus = 'checking...';
+
+  constructor(private http: HttpClient) {
+    this.http.get<any>('http://localhost:3000/health').subscribe({
+      next: (r) => this.apiStatus = '✅ ' + r.status,
+      error: () => this.apiStatus = '❌ unreachable'
+    });
+  }
 }
