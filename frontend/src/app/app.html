@@ -1,5 +1,8 @@
 <div style="padding: 2rem; font-family: sans-serif">
-  <h1>Line manager</h1>
-  <p>Frontend: <strong>✅ live</strong></p>
-  <p>Backend: <strong>{{ apiStatus }}</strong></p>
+  <h1>Line manager 0.02</h1>
+  <ul>
+    <li *ngFor="let item of items">{{ item.name }}</li>
+  </ul>
+  <button (click)="loadAltItems()">Load Alt Items</button>
+  <button (click)="doNothing()">Do Nothing</button>
 </div>
