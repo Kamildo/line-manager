@@ -1,13 +1,29 @@
 import Database, { Database as DatabaseType } from 'better-sqlite3';
 import path from 'path';
+import fs from 'fs';
 
-const isOnline = true;
+const dbPath = path.join(__dirname, '../data/app.db');
+const isOnline = process.env.RENDER === 'true';
+//const isOnline = true // for debugging without deploying to render, will use in-memory db 
 
 const db: DatabaseType = isOnline
     ? new Database(':memory:')
-    : new Database(path.join(__dirname, '../../data/app.db'));
+    : (() => {
+        if (!fs.existsSync(dbPath)) {
+            // TODO: Scenario 3 - no DB found, show setup screen
+            // TODO: Scenario 4 - allow custom path
+            console.warn('No database file found at', dbPath);
+            console.warn('Creating new database with test data...');
+            fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+            return new Database(dbPath);
+        }
+        return new Database(dbPath);
+    })();
 export function initDb(withTestData = false) {
 
+    if (!isOnline) {
+        return; //for now skip todo change when making scenario 3 and 4
+    }
     db.pragma('foreign_keys = ON');
 
 

@@ -5,12 +5,10 @@ import queries from './queries';
 
 const app = express();
 const PORT = 3000;
-const VERSION = '0.0.3';
+const VERSION = '0.0.4';
 
-// TODO:offline, for now hardcode online for testing
-const isOnline = true;
-
-initDb(isOnline);
+//todo scenario 3 and 4 - if no DB found, show setup screen, allow custom path and initiation with empty database
+initDb(true);
 
 app.use(cors());
 app.use(express.json());
