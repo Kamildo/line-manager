@@ -1,36 +1,27 @@
 import express from 'express';
 import cors from 'cors';
+import { initDb } from './database';
+import queries from './queries';
 
 const app = express();
 const PORT = 3000;
-const VERSION = '0.0.2';
+const VERSION = '0.0.3';
+
+// TODO:offline, for now hardcode online for testing
+const isOnline = true;
+
+initDb(isOnline);
 
 app.use(cors());
 app.use(express.json());
-
+app.use(queries);
 
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok' });
+    res.json({ status: 'ok', version: VERSION });
 });
+
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
     console.log(`Version: ${VERSION}`);
 });
-
-app.get('/api/items', (req, res) => {
-    res.json([
-        { id: 1, name: 'Item One' },
-        { id: 2, name: 'Item Two' },
-        { id: 3, name: 'Item Three' }
-    ]);
-});
-
-app.get('/api/items2', (req, res) => {
-    res.json([
-        { id: 4, name: 'Alt Item One' },
-        { id: 5, name: 'Alt Item Two' },
-        { id: 6, name: 'Alt Item Three' }
-    ]);
-});
-

@@ -15,8 +15,8 @@ export class App implements OnInit {
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
 
-  loadItems() {
-    this.http.get<any[]>(`${environment.apiUrl}/api/items`).subscribe({
+  loadProducts() {
+    this.http.get<any[]>(`${environment.apiUrl}/api/products`).subscribe({
       next: (data) => {
         this.items = data;
         this.cdr.markForCheck();
@@ -25,8 +25,8 @@ export class App implements OnInit {
     });
   }
 
-  loadAltItems() {
-    this.http.get<any[]>(`${environment.apiUrl}/api/items2`).subscribe({
+  loadAssembly_lines() {
+    this.http.get<any[]>(`${environment.apiUrl}/api/assembly_lines`).subscribe({
       next: (data) => {
         this.items = data;
         this.cdr.markForCheck();
@@ -34,15 +34,20 @@ export class App implements OnInit {
       error: (e) => console.log('Error:', e)
     });
   }
-
+  
+  loadWorkstations() {
+    this.http.get<any[]>(`${environment.apiUrl}/api/workstations`).subscribe({
+      next: (data) => {
+        this.items = data;
+        this.cdr.markForCheck();
+      },
+      error: (e) => console.log('Error:', e)
+    });
+  }
 
   ngOnInit() {
-    this.loadItems();
+    this.loadProducts();
   }
 
-  
-  doNothing() {
-    console.log('nothing');
-  }
  
 }
