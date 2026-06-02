@@ -1,0 +1,46 @@
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #1f2937;
+  color: #ffffff;
+}
+
+.app-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.version {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-left: 6px;
+}
+
+.app-nav {
+  display: flex;
+  gap: 6px;
+}
+
+.app-nav a {
+  text-decoration: none;
+  color: #e5e7eb;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.app-nav a:hover {
+  background: #374151;
+}
+
+.app-nav a.active {
+  background: #2563eb;
+  color: white;
+}
+
+.app-content {
+  padding: 16px;
+}

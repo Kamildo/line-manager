@@ -2,12 +2,14 @@ import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { environment } from '../environments/environment';
+import { RouterOutlet, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule,RouterOutlet, RouterLink],
   templateUrl: './app.html',
   styleUrl: './app.scss',
-  imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class App implements OnInit {

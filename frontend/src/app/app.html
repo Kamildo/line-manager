@@ -1,8 +1,25 @@
-<div style="padding: 2rem; font-family: sans-serif">
-  <h1>Line manager 0.03</h1>
+<header class="app-header">
+  <div class="app-title">
+    {{ 'Line manager' }} <span class="version">{{ '0.1' }}</span>
+  </div>
+
+  <nav class="app-nav">
+    <a routerLink="/assignments">Assignments</a>
+    <a routerLink="/products">Products</a>
+    <a routerLink="/assembly-lines">Assembly Lines</a>
+    <a routerLink="/workstations">Workstations</a>
+    <a routerLink="/settings">Settings</a>
+  </nav>
+</header>
+
+<main class="app-content">
+  <router-outlet></router-outlet>
+</main>
+
+<!--<div style="padding: 2rem; font-family: sans-serif">
   <ul>
     <li *ngFor="let item of items">{{ item.name }}</li>
   </ul>
   <button (click)="loadAssembly_lines()">Load assembly lines</button>
   <button (click)="loadWorkstations()">Load workstations</button>
-</div>
+</div>-->
