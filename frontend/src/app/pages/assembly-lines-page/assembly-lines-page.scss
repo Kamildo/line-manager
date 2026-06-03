@@ -1,0 +1,390 @@
+// ─── Variables ───────────────────────────────────────────────────────────────
+$color-bg: #0f1117;
+$color-surface: #181c27;
+$color-surface-2: #1e2335;
+$color-border: #2a2f45;
+$color-accent: #4f8ef7;
+$color-accent-dim: rgba(79, 142, 247, 0.15);
+$color-danger: #e05c5c;
+$color-success: #3ecf8e;
+$color-text: #e2e6f0;
+$color-text-muted: #6b7594;
+$color-text-dim: #3d4460;
+
+$radius-sm: 4px;
+$radius-md: 8px;
+
+$sidebar-width: 480px;
+
+// ─── Layout ──────────────────────────────────────────────────────────────────
+.al-page {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  background: $color-bg;
+  color: $color-text;
+  font-family: 'DM Mono', 'Fira Mono', monospace;
+  font-size: 13px;
+}
+
+// ─── Sidebar ─────────────────────────────────────────────────────────────────
+.al-sidebar {
+  width: $sidebar-width;
+  min-width: $sidebar-width;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid $color-border;
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid $color-border;
+    background: $color-surface;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+}
+
+// ─── Filters ─────────────────────────────────────────────────────────────────
+.al-filters {
+  padding: 16px 20px;
+  border-bottom: 1px solid $color-border;
+  background: $color-surface;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  &__row {
+    display: flex;
+    gap: 12px;
+
+    .form-field--inline {
+      flex: 1;
+    }
+  }
+}
+
+// ─── List ─────────────────────────────────────────────────────────────────────
+.al-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+  overflow-y: auto;
+  flex: 1;
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: background 0.12s, border-color 0.12s;
+
+    &:hover {
+      background: $color-surface-2;
+    }
+
+    &--selected {
+      background: $color-accent-dim;
+      border-left-color: $color-accent;
+    }
+  }
+
+  &__name {
+    font-weight: 500;
+  }
+
+  &__badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  &__empty {
+    padding: 24px 20px;
+    color: $color-text-muted;
+    text-align: center;
+    font-style: italic;
+  }
+}
+
+// ─── Badges ───────────────────────────────────────────────────────────────────
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: $radius-sm;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+
+  &--active {
+    background: rgba($color-success, 0.15);
+    color: $color-success;
+  }
+
+  &--inactive {
+    background: rgba($color-text-muted, 0.12);
+    color: $color-text-muted;
+  }
+
+  &--product {
+    background: rgba($color-accent, 0.12);
+    color: $color-accent;
+  }
+}
+
+// ─── Detail Panel ─────────────────────────────────────────────────────────────
+.al-detail {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+
+  &__section {
+    padding: 24px 28px;
+    border-bottom: 1px solid $color-border;
+
+    &-title {
+      margin: 0 0 16px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: $color-text-muted;
+    }
+  }
+
+  &__actions {
+    padding: 16px 28px;
+    display: flex;
+    gap: 10px;
+    border-bottom: 1px solid $color-border;
+    background: $color-surface;
+  }
+
+  &__product-name {
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 12px;
+    background: $color-surface-2;
+    border-radius: $radius-md;
+    border: 1px solid $color-border;
+    display: inline-block;
+  }
+
+  &__empty-text {
+    color: $color-text-dim;
+    font-style: italic;
+  }
+}
+
+// ─── Detail Form ──────────────────────────────────────────────────────────────
+.detail-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 480px;
+}
+
+// ─── Workstations List ────────────────────────────────────────────────────────
+.ws-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &__item {
+    display: grid;
+    grid-template-columns: 28px 1fr auto auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: $color-surface-2;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    transition: border-color 0.12s;
+
+    &:hover {
+      border-color: $color-accent;
+    }
+  }
+
+  &__order {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: $color-accent-dim;
+    color: $color-accent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  &__name {
+    font-weight: 500;
+  }
+
+  &__short {
+    font-size: 11px;
+    color: $color-text-muted;
+    background: $color-surface;
+    padding: 2px 6px;
+    border-radius: $radius-sm;
+  }
+
+  &__pc {
+    font-size: 11px;
+    color: $color-text-muted;
+  }
+}
+
+// ─── Form Primitives ─────────────────────────────────────────────────────────
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  &--inline {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &--checkbox {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+}
+
+.form-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: $color-text-muted;
+  white-space: nowrap;
+}
+
+.form-input, .form-select {
+  background: $color-surface-2;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  color: $color-text;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 8px 12px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: $color-text-dim;
+  }
+
+  &:focus {
+    border-color: $color-accent;
+    box-shadow: 0 0 0 3px $color-accent-dim;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.form-select option {
+  background: $color-surface-2;
+}
+
+.form-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: $color-accent;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ─── Buttons ─────────────────────────────────────────────────────────────────
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border: none;
+  border-radius: $radius-md;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.12s, opacity 0.12s, transform 0.08s;
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &--primary {
+    background: $color-accent;
+    color: #fff;
+
+    &:hover {
+      background: lighten($color-accent, 8%);
+    }
+  }
+
+  &--secondary {
+    background: $color-surface-2;
+    color: $color-text;
+    border: 1px solid $color-border;
+
+    &:hover {
+      border-color: $color-accent;
+      color: $color-accent;
+    }
+  }
+
+  &--danger {
+    background: rgba($color-danger, 0.12);
+    color: $color-danger;
+    border: 1px solid rgba($color-danger, 0.25);
+
+    &:hover {
+      background: rgba($color-danger, 0.22);
+    }
+  }
+
+  &--ghost {
+    background: transparent;
+    color: $color-text-muted;
+    border: 1px solid $color-border;
+
+    &:hover {
+      color: $color-text;
+      border-color: $color-text-muted;
+    }
+  }
+}
