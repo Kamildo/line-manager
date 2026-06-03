@@ -57,6 +57,7 @@ export function initDb(withTestData = false) {
   CREATE TABLE IF NOT EXISTS assembly_line_workstations (
     assembly_line_id INTEGER NOT NULL,
     workstation_id INTEGER NOT NULL,
+    order_index INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY (assembly_line_id, workstation_id),
     FOREIGN KEY (assembly_line_id) REFERENCES assembly_lines(id),
     FOREIGN KEY (workstation_id) REFERENCES workstations(id)
@@ -101,23 +102,23 @@ export function seedTestData() {
     });
 
     // ws index: 0=LW,1=MW,2=DA,3=VDT,4=LT,5=HV,6=FI,7=FA,8=TST,9=DSP
-    const assign = db.prepare('INSERT INTO assembly_line_workstations (assembly_line_id, workstation_id) VALUES (?, ?)');
+    const assign = db.prepare('INSERT INTO assembly_line_workstations (assembly_line_id, workstation_id, order_index) VALUES (?, ?, ?)');
     const assignments = [
-        [lines[0], workstations[7]], // Convey:        Frame assembly
-        [lines[0], workstations[2]], // Convey:        Drive assembly
-        [lines[1], workstations[1]], // Manual:        Manual welding
-        [lines[1], workstations[0]], // Manual:        Laser welding
-        [lines[1], workstations[7]], // Manual:        Frame assembly
-        [lines[2], workstations[2]], // Final assembly: Drive assembly
-        [lines[2], workstations[6]], // Final assembly: Final inspection
-        [lines[2], workstations[9]], // Final assembly: Dispatch
-        [lines[3], workstations[3]], // Testing:       Voltage drop test
-        [lines[3], workstations[4]], // Testing:       Leakage test
-        [lines[3], workstations[5]], // Testing:       HV/PD test
-        [lines[3], workstations[8]], // Testing:       Testing
-        [lines[3], workstations[6]], // Testing:       Final inspection
+        [lines[0], workstations[7], 1], // Convey:         Frame assembly
+        [lines[0], workstations[2], 2], // Convey:         Drive assembly
+        [lines[1], workstations[1], 1], // Manual:         Manual welding
+        [lines[1], workstations[0], 2], // Manual:         Laser welding
+        [lines[1], workstations[7], 3], // Manual:         Frame assembly
+        [lines[2], workstations[2], 1], // Final assembly: Drive assembly
+        [lines[2], workstations[6], 2], // Final assembly: Final inspection
+        [lines[2], workstations[9], 3], // Final assembly: Dispatch
+        [lines[3], workstations[3], 1], // Testing:        Voltage drop test
+        [lines[3], workstations[4], 2], // Testing:        Leakage test
+        [lines[3], workstations[5], 3], // Testing:        HV/PD test
+        [lines[3], workstations[8], 4], // Testing:        Testing
+        [lines[3], workstations[6], 5], // Testing:        Final inspection
     ];
-    assignments.forEach(([l, w]) => assign.run(l, w));
+    assignments.forEach(([l, w, o]) => assign.run(l, w, o));
 }
 
 
