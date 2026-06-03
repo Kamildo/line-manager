@@ -86,16 +86,27 @@ export class AssigmentsPage {
   }
 
   confirmProductAssign() {
-    this.assemblyLines = this.assemblyLines.map(al => {
-      if (al.product_id === this.selectedProduct && !this.pendingAL.includes(al.id))
-        return { ...al, product_id: null };
-      if (this.pendingAL.includes(al.id))
-        return { ...al, product_id: this.selectedProduct };
-      return al;
+//    console.log('start:');
+    const payload = {
+      product_id: this.selectedProduct,
+      al_ids: this.pendingAL
+    };
+  //  console.log('sending:', JSON.stringify(payload));
+    this.http.put(`${environment.apiUrl}/api/assembly_lines/assign-products`, payload).subscribe({
+      next: () => {
+     //   console.log('success');
+        this.assemblyLines = this.assemblyLines.map(al => {
+          if (al.product_id === this.selectedProduct && !this.pendingAL.includes(al.id))
+            return { ...al, product_id: null };
+          if (this.pendingAL.includes(al.id))
+            return { ...al, product_id: this.selectedProduct };
+          return al;
+        });
+        this.savedPendingAL = [...this.pendingAL];
+        this.pendingChangesProduct = false;
+      },
+      error: (e) => console.error('assign product:', e)
     });
-    this.savedPendingAL = [...this.pendingAL];
-    this.pendingChangesProduct = false;
-    console.log('save P->AL', this.selectedProduct, this.pendingAL);
   }
 
   // ── AL side ───────────────────────────────────────────────
@@ -162,10 +173,19 @@ export class AssigmentsPage {
   }
 
   confirmWSAssign() {
-    this.savedAssignedWS = [...this.assignedWS];
-    this.savedUnassignedWS = [...this.unassignedWS];
-    this.pendingChangesAL = false;
-    console.log('save AL->WS', this.selectedAL, this.assignedWS.map(w => w.id));
+    const payload = this.assignedWS.map((ws, index) => ({
+      id: ws.id,
+      order_index: index + 1
+    }));
+    console.log('sending:', JSON.stringify(payload));
+    this.http.put(`${environment.apiUrl}/api/assembly_lines/${this.selectedAL}/workstations`, payload).subscribe({
+      next: () => {
+        this.savedAssignedWS = [...this.assignedWS];
+        this.savedUnassignedWS = [...this.unassignedWS];
+        this.pendingChangesAL = false;
+      },
+      error: (e) => console.error('assign workstations:', e)
+    });
   }
 
   // ── Dialog ────────────────────────────────────────────────

@@ -46,4 +46,45 @@ router.get('/api/assembly_lines/:id/workstations/unassigned', (req, res) => {
 });
 
 
+//assignments endpoints
+
+router.put('/api/assembly_lines/assign-products', (req, res) => {
+    const { product_id, al_ids } = req.body;
+    const update = db.transaction(() => {
+        db.prepare(`
+        UPDATE assembly_lines SET product_id = NULL
+        WHERE product_id = ?
+        ${al_ids.length > 0 ? `AND id NOT IN (${al_ids.map(() => '?').join(',')})` : ''}
+        `).run(product_id, ...al_ids);
+        if (al_ids.length > 0) {
+            const assign = db.prepare(`
+                UPDATE assembly_lines SET product_id = ? WHERE id = ?
+                AND (product_id IS NULL OR product_id != ?)
+            `);
+            al_ids.forEach((id: number) => assign.run(product_id, id, product_id));
+        }
+    });
+    update();
+    res.json({ success: true });
+});
+
+router.put('/api/assembly_lines/:id/workstations', (req, res) => {
+    const alId = Number(req.params.id);
+    const workstations: { id: number, order_index: number }[] = req.body;
+    const update = db.transaction(() => {
+        db.prepare(`DELETE FROM assembly_line_workstations WHERE assembly_line_id = ?`).run(alId);
+        if (workstations.length > 0) {
+            const insert = db.prepare(`
+                INSERT INTO assembly_line_workstations (assembly_line_id, workstation_id, order_index)
+                VALUES (?, ?, ?)
+            `);
+            workstations.forEach(ws => insert.run(alId, ws.id, ws.order_index));
+        }
+    });
+    update();
+    res.json({ success: true });
+});
+
+
+
 export default router;
