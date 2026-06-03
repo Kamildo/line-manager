@@ -1,1 +1,97 @@
-<p>assigments-page works!</p>
+<div class="assignments-layout">
+
+  <!-- LEFT GROUP: Product <-> Assembly Lines -->
+  <div class="group">
+    <div class="panels">
+
+      <div class="panel">
+        <h3>Products</h3>
+        <ul>
+          @for (p of products; track p.id) {
+          <li [class.selected]="selectedProduct === p.id"
+              (click)="selectProduct(p.id)">
+            {{ p.name }}
+          </li>
+          }
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h3>Assembly Lines</h3>
+        @if (selectedProduct === null) {
+        <p class="hint">Select a product first</p>
+        } @else {
+        <ul>
+          @for (al of visibleAL; track al.id) {
+          <li (click)="toggleAL(al.id)">
+            <input type="checkbox" [checked]="pendingAL.includes(al.id)" (click)="$event.stopPropagation()">
+            {{ al.name }}
+          </li>
+          }
+        </ul>
+        }
+      </div>
+
+    </div>
+    <button [disabled]="selectedProduct === null" (click)="confirmProductAssign()">
+      Confirm
+    </button>
+  </div>
+
+  <!-- RIGHT GROUP: Assembly Lines <-> Workstations -->
+  <div class="group">
+    <div class="panels">
+
+      <div class="panel">
+        <h3>Assembly Lines</h3>
+        <ul>
+          @for (al of assemblyLines; track al.id) {
+          <li [class.selected]="selectedAL === al.id"
+              (click)="selectAL(al.id)">
+            {{ al.name }}
+          </li>
+          }
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h3>Assigned</h3>
+        @if (selectedAL === null) {
+        <p class="hint">Select a line first</p>
+        } @else {
+        <ul id="assigned"
+            cdkDropList
+            [cdkDropListData]="assigned"
+            [cdkDropListConnectedTo]="['unassigned']"
+            (cdkDropListDropped)="drop($event)">
+          @for (ws of assigned; track ws.id) {
+          <li cdkDrag (dblclick)="unassign(ws.id)">{{ ws.name }}</li>
+          }
+        </ul>
+        }
+      </div>
+
+      <div class="panel">
+        <h3>Unassigned</h3>
+        @if (selectedAL === null) {
+        <p class="hint">Select a line first</p>
+        } @else {
+        <ul id="unassigned"
+            cdkDropList
+            [cdkDropListData]="unassigned"
+            [cdkDropListConnectedTo]="['assigned']"
+            (cdkDropListDropped)="drop($event)">
+          @for (ws of unassigned; track ws.id) {
+          <li cdkDrag (dblclick)="assign(ws.id)">{{ ws.name }}</li>
+          }
+        </ul>
+        }
+      </div>
+
+    </div>
+    <button [disabled]="selectedAL === null" (click)="confirmWSAssign()">
+      Confirm
+    </button>
+  </div>
+
+</div>
