@@ -1,67 +1,80 @@
-import { Component } from '@angular/core';
-import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
+import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CommonModule } from '@angular/common';
+import { environment } from '../../../environments/environment';
+
+interface Product { id: number; name: string; }
+interface AssemblyLine { id: number; name: string; product_id: number | null; }
+interface Workstation { id: number; name: string; order_index?: number; }
 
 @Component({
   selector: 'app-assigments-page',
-  imports: [DragDropModule],
+  imports: [DragDropModule, CommonModule],
   templateUrl: './assigments-page.html',
   styleUrl: './assigments-page.scss',
 })
 export class AssigmentsPage {
-  products = [
-    { id: 1, name: 'Product A' },
-    { id: 2, name: 'Product B' },
-    { id: 3, name: 'Product C' },
-  ];
+  private http = inject(HttpClient);
+  private cdr = inject(ChangeDetectorRef);
 
-  assemblyLines = [
-    { id: 1, name: 'Line 1', productId: 1 },
-    { id: 2, name: 'Line 2', productId: 1 },
-    { id: 3, name: 'Line 3', productId: 2 },
-    { id: 4, name: 'Line 4', productId: null },
-    { id: 5, name: 'Line 5', productId: null },
-  ];
-
-  workstations = [
-    { id: 1, name: 'Workstation 1' },
-    { id: 2, name: 'Workstation 2' },
-    { id: 3, name: 'Workstation 3' },
-    { id: 4, name: 'Workstation 4' },
-    { id: 5, name: 'Workstation 5' },
-  ];
-
-  assignments: Record<number, number[]> = {
-    1: [1, 2],
-    2: [3],
-    3: [],
-    4: [],
-    5: [],
-  };
+  products: Product[] = [];
+  assemblyLines: AssemblyLine[] = [];
+  assignedWS: Workstation[] = [];
+  unassignedWS: Workstation[] = [];
+  savedAssignedWS: Workstation[] = [];
+  savedUnassignedWS: Workstation[] = [];
 
   selectedProduct: number | null = null;
   selectedAL: number | null = null;
 
-  // pending P->AL changes, reset on confirm/discard
   pendingAL: number[] = [];
+  savedPendingAL: number[] = [];
+
+  pendingChangesProduct = false;
+  pendingChangesAL = false;
+
+  dialogSide: 'product' | 'al' | null = null;
+  pendingProductSwitch: number | null = null;
+  pendingALSwitch: number | null = null;
+
+  ngOnInit() {
+    this.http.get<Product[]>(`${environment.apiUrl}/api/products`).subscribe({
+      next: (data) => { this.products = data; this.cdr.markForCheck(); },
+      error: (e) => console.error('products:', e)
+    });
+    this.http.get<AssemblyLine[]>(`${environment.apiUrl}/api/assembly_lines`).subscribe({
+      next: (data) => { this.assemblyLines = data; this.cdr.markForCheck(); },
+      error: (e) => console.error('assembly_lines:', e)
+    });
+  }
+
+  // ── Product side ──────────────────────────────────────────
 
   get visibleAL() {
     if (this.selectedProduct === null) return [];
     return this.assemblyLines.filter(
-      al => al.productId === null || al.productId === this.selectedProduct
+      al => al.product_id === null || al.product_id === this.selectedProduct
     );
   }
 
-  isALAssignedToSelected(alId: number) {
-    const al = this.assemblyLines.find(a => a.id === alId);
-    return al?.productId === this.selectedProduct;
+  selectProduct(id: number) {
+    if (id === this.selectedProduct) return;
+    if (this.pendingChangesProduct) {
+      this.dialogSide = 'product';
+      this.pendingProductSwitch = id;
+      return;
+    }
+    this.doSelectProduct(id);
   }
 
-  selectProduct(id: number) {
+  doSelectProduct(id: number) {
     this.selectedProduct = id;
-    this.selectedAL = null;
     this.pendingAL = this.assemblyLines
-      .filter(al => al.productId === id)
+      .filter(al => al.product_id === id)
       .map(al => al.id);
+    this.savedPendingAL = [...this.pendingAL];
+    this.pendingChangesProduct = false;
   }
 
   toggleAL(alId: number) {
@@ -69,57 +82,143 @@ export class AssigmentsPage {
       this.pendingAL = this.pendingAL.filter(id => id !== alId);
     else
       this.pendingAL.push(alId);
-  }
-
-  selectAL(id: number) {
-    this.selectedAL = id;
-  }
-
-  get assigned() {
-    if (this.selectedAL === null) return [];
-    return this.workstations.filter(ws =>
-      this.assignments[this.selectedAL!].includes(ws.id)
-    );
-  }
-
-  get unassigned() {
-    if (this.selectedAL === null) return [];
-    return this.workstations.filter(ws =>
-      !this.assignments[this.selectedAL!].includes(ws.id)
-    );
-  }
-
-  assign(wsId: number) {
-    if (this.selectedAL === null) return;
-    this.assignments[this.selectedAL].push(wsId);
-  }
-
-  unassign(wsId: number) {
-    if (this.selectedAL === null) return;
-    this.assignments[this.selectedAL] =
-      this.assignments[this.selectedAL].filter(id => id !== wsId);
-  }
-
-  drop(event: CdkDragDrop<{ id: number; name: string }[]>) {
-    if (event.previousContainer === event.container) return;
-    const ws = event.previousContainer.data[event.previousIndex];
-    if (event.container.id === 'assigned') this.assign(ws.id);
-    else this.unassign(ws.id);
+    this.pendingChangesProduct = !this.arraysEqual(this.pendingAL, this.savedPendingAL);
   }
 
   confirmProductAssign() {
-    // apply pending to mock data
     this.assemblyLines = this.assemblyLines.map(al => {
-      if (al.productId === this.selectedProduct && !this.pendingAL.includes(al.id))
-        return { ...al, productId: null };
+      if (al.product_id === this.selectedProduct && !this.pendingAL.includes(al.id))
+        return { ...al, product_id: null };
       if (this.pendingAL.includes(al.id))
-        return { ...al, productId: this.selectedProduct };
+        return { ...al, product_id: this.selectedProduct };
       return al;
+    });
+    this.savedPendingAL = [...this.pendingAL];
+    this.pendingChangesProduct = false;
+    console.log('save P->AL', this.selectedProduct, this.pendingAL);
+  }
+
+  // ── AL side ───────────────────────────────────────────────
+
+  selectAL(id: number) {
+    if (id === this.selectedAL) return;
+    if (this.pendingChangesAL) {
+      this.dialogSide = 'al';
+      this.pendingALSwitch = id;
+      return;
+    }
+    this.doSelectAL(id);
+  }
+
+  doSelectAL(id: number) {
+    this.selectedAL = id;
+    this.pendingChangesAL = false;
+    this.http.get<Workstation[]>(`${environment.apiUrl}/api/assembly_lines/${id}/workstations`).subscribe({
+      next: (data) => {
+        this.assignedWS = data;
+        this.savedAssignedWS = [...data];
+        this.cdr.markForCheck();
+      },
+      error: (e) => console.error('assigned ws:', e)
+    });
+    this.http.get<Workstation[]>(`${environment.apiUrl}/api/assembly_lines/${id}/workstations/unassigned`).subscribe({
+      next: (data) => {
+        this.unassignedWS = data;
+        this.savedUnassignedWS = [...data];
+        this.cdr.markForCheck();
+      },
+      error: (e) => console.error('unassigned ws:', e)
     });
   }
 
+  assign(wsId: number) {
+    const ws = this.unassignedWS.find(w => w.id === wsId);
+    if (!ws) return;
+    this.unassignedWS = this.unassignedWS.filter(w => w.id !== wsId);
+    this.assignedWS = [...this.assignedWS, ws];
+    this.pendingChangesAL = true;
+  }
+
+  unassign(wsId: number) {
+    const ws = this.assignedWS.find(w => w.id === wsId);
+    if (!ws) return;
+    this.assignedWS = this.assignedWS.filter(w => w.id !== wsId);
+    this.unassignedWS = [...this.unassignedWS, ws];
+    this.pendingChangesAL = true;
+  }
+
+  drop(event: CdkDragDrop<Workstation[]>) {
+    if (event.previousContainer === event.container) {
+      const list = [...event.container.data];
+      moveItemInArray(list, event.previousIndex, event.currentIndex);
+      if (event.container.id === 'assigned') this.assignedWS = list;
+      else this.unassignedWS = list;
+      this.pendingChangesAL = true;
+    } else {
+      const ws = event.previousContainer.data[event.previousIndex];
+      if (event.container.id === 'assigned') this.assign(ws.id);
+      else this.unassign(ws.id);
+    }
+  }
+
   confirmWSAssign() {
-    // API call goes here later
-    console.log('save WS assignments for AL', this.selectedAL, this.assignments[this.selectedAL!]);
+    this.savedAssignedWS = [...this.assignedWS];
+    this.savedUnassignedWS = [...this.unassignedWS];
+    this.pendingChangesAL = false;
+    console.log('save AL->WS', this.selectedAL, this.assignedWS.map(w => w.id));
+  }
+
+  // ── Dialog ────────────────────────────────────────────────
+
+  dialogConfirm() {
+    if (this.dialogSide === 'product') {
+      this.confirmProductAssign();
+      const next = this.pendingProductSwitch!;
+      this.dialogSide = null;
+      this.pendingProductSwitch = null;
+      this.doSelectProduct(next);
+    } else if (this.dialogSide === 'al') {
+      this.confirmWSAssign();
+      const next = this.pendingALSwitch!;
+      this.dialogSide = null;
+      this.pendingALSwitch = null;
+      this.doSelectAL(next);
+    }
+  }
+
+  dialogDiscard() {
+    if (this.dialogSide === 'product') {
+      this.pendingAL = [...this.savedPendingAL];
+      this.pendingChangesProduct = false;
+      const next = this.pendingProductSwitch!;
+      this.dialogSide = null;
+      this.pendingProductSwitch = null;
+      this.doSelectProduct(next);
+    } else if (this.dialogSide === 'al') {
+      this.assignedWS = [...this.savedAssignedWS];
+      this.unassignedWS = [...this.savedUnassignedWS];
+      this.pendingChangesAL = false;
+      const next = this.pendingALSwitch!;
+      this.dialogSide = null;
+      this.pendingALSwitch = null;
+      this.doSelectAL(next);
+    }
+  }
+
+  discardProduct() {
+    this.pendingAL = [...this.savedPendingAL];
+    this.pendingChangesProduct = false;
+  }
+
+  discardAL() {
+    this.assignedWS = [...this.savedAssignedWS];
+    this.unassignedWS = [...this.savedUnassignedWS];
+    this.pendingChangesAL = false;
+  }
+
+  // ── Utils ─────────────────────────────────────────────────
+
+  private arraysEqual(a: number[], b: number[]) {
+    return a.length === b.length && [...a].sort().every((v, i) => v === [...b].sort()[i]);
   }
 }

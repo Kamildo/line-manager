@@ -33,9 +33,10 @@
       </div>
 
     </div>
-    <button [disabled]="selectedProduct === null" (click)="confirmProductAssign()">
-      Confirm
-    </button>
+    <div class="button-row">
+      <button [disabled]="!pendingChangesProduct" (click)="confirmProductAssign()">Confirm</button>
+      <button [disabled]="!pendingChangesProduct" (click)="discardProduct()">Discard</button>
+    </div>
   </div>
 
   <!-- RIGHT GROUP: Assembly Lines <-> Workstations -->
@@ -61,10 +62,10 @@
         } @else {
         <ul id="assigned"
             cdkDropList
-            [cdkDropListData]="assigned"
+            [cdkDropListData]="assignedWS"
             [cdkDropListConnectedTo]="['unassigned']"
             (cdkDropListDropped)="drop($event)">
-          @for (ws of assigned; track ws.id) {
+          @for (ws of assignedWS; track ws.id) {
           <li cdkDrag (dblclick)="unassign(ws.id)">{{ ws.name }}</li>
           }
         </ul>
@@ -78,10 +79,10 @@
         } @else {
         <ul id="unassigned"
             cdkDropList
-            [cdkDropListData]="unassigned"
+            [cdkDropListData]="unassignedWS"
             [cdkDropListConnectedTo]="['assigned']"
             (cdkDropListDropped)="drop($event)">
-          @for (ws of unassigned; track ws.id) {
+          @for (ws of unassignedWS; track ws.id) {
           <li cdkDrag (dblclick)="assign(ws.id)">{{ ws.name }}</li>
           }
         </ul>
@@ -89,9 +90,22 @@
       </div>
 
     </div>
-    <button [disabled]="selectedAL === null" (click)="confirmWSAssign()">
-      Confirm
-    </button>
+
+    <div class="button-row">
+      <button [disabled]="!pendingChangesAL" (click)="confirmWSAssign()">Confirm</button>
+      <button [disabled]="!pendingChangesAL" (click)="discardAL()">Discard</button>
+    </div>
+
+    @if (dialogSide  !== null) {
+    <div class="dialog-overlay">
+      <div class="dialog">
+        <p>You have unsaved changes. Confirm or discard before switching.</p>
+        <div class="dialog-actions">
+          <button (click)="dialogConfirm()">Confirm</button>
+          <button (click)="dialogDiscard()">Discard</button>
+        </div>
+      </div>
+    </div>
+    }
   </div>
 
-</div>

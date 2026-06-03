@@ -82,3 +82,58 @@
     font-size: 0.875rem;
   }
 }
+
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.dialog {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  p {
+    margin: 0;
+  }
+
+  .dialog-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+
+    button {
+      padding: 0.4rem 1rem;
+      border-radius: 4px;
+      border: 1px solid #aaa;
+      cursor: pointer;
+    }
+  }
+}
+.button-row {
+  display: flex;
+  gap: 0.5rem;
+
+  button {
+    flex: 1;
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #aaa;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  }
+}
+

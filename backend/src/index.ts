@@ -5,7 +5,7 @@ import queries from './queries';
 
 const app = express();
 const PORT = 3000;
-const VERSION = '0.0.4';
+const VERSION = '0.0.5';
 
 //todo scenario 3 and 4 - if no DB found, show setup screen, allow custom path and initiation with empty database
 initDb(true);

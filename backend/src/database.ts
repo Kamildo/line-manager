@@ -4,8 +4,8 @@ import fs from 'fs';
 
 const dbPath = path.join(__dirname, '../data/app.db');
 const isOnline = process.env.RENDER === 'true';
-//const isOnline = true // for debugging without deploying to render, will use in-memory db 
-
+//const isOnline = true // for debugging without deploying to render, will use in-memory db
+//const isOnline = false;// for debugging
 const db: DatabaseType = isOnline
     ? new Database(':memory:')
     : (() => {
@@ -24,6 +24,7 @@ export function initDb(withTestData = false) {
     if (!isOnline) {
         return; //for now skip todo change when making scenario 3 and 4
     }
+    console.log(`Initializing database... isOnline: ${isOnline} 'dbPath:', ${dbPath}`);
     db.pragma('foreign_keys = ON');
 
 
@@ -79,6 +80,7 @@ export function seedTestData() {
         { name: 'Manual line', active: 1, product: products[1] },
         { name: 'Final assembly line', active: 1, product: products[2] },
         { name: 'Testing line', active: 0, product: products[3] },
+        { name: 'Empty line', active: 0, product: null },
     ].map(l => {
         const result = insertLine.run(l.name, l.active, l.product);
         return result.lastInsertRowid;
