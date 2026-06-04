@@ -81,6 +81,7 @@
     <div class="al-detail__actions">
       <ng-container *ngIf="!selectedLine">
         <button class="btn btn--primary" (click)="onAddNew()">Add New</button>
+        <button class="btn btn--ghost" (click)="onCancel()">Cancel</button>
       </ng-container>
       <ng-container *ngIf="selectedLine && !isEditing">
         <button class="btn btn--secondary" (click)="onEdit()">Edit</button>

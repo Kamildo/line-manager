@@ -148,6 +148,10 @@ export class AssemblyLinesPage implements OnInit {
     {
       return alert('Name is required');
     }
+    else if (this.selectedLine && !this.isEditing) {
+      this.selectedLine = null;
+      return;
+    }
     const body = { name: this.editForm.name, active: this.editForm.active, product_id: null };
     this.http.post<AssemblyLine>(`${environment.apiUrl}/api/assembly_lines`, body).subscribe({
       next: () => {
@@ -195,9 +199,11 @@ export class AssemblyLinesPage implements OnInit {
     if (this.selectedLine)
     {
         this.editForm = { name: this.selectedLine.name, active: this.selectedLine.active, productId: this.selectedLine.product_id };
+      this.isEditing = false;
     }
     else {
-        this.editForm = { name: '', active: true, productId: null };
+      this.editForm = { name: '', active: true, productId: null };
+      this.isEditing = false;
           }    
   }
 }
