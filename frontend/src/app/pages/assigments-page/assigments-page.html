@@ -24,7 +24,7 @@
         <ul>
           @for (al of visibleAL; track al.id) {
           <li (click)="toggleAL(al.id)">
-            <input type="checkbox" [checked]="pendingAL.includes(al.id)" (click)="$event.stopPropagation()">
+            <input type="checkbox" [checked]="pendingAL.includes(al.id)" (click)="toggleAL(al.id); $event.stopPropagation()">
             {{ al.name }}
           </li>
           }

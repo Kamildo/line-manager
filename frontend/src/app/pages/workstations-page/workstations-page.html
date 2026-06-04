@@ -5,40 +5,42 @@
       <h2 class="w-sidebar__title">Workstations</h2>
     </header>
     <div class="w-filters">
-      <div class="form-field">
-        <label class="form-label">Name</label>
-        <input class="form-input" type="text" placeholder="Search by name…"
-               [(ngModel)]="filters.name" (ngModelChange)="onFilterChange()" />
+      <div class="al-filters__row">
+        <div class="form-field">
+          <label class="form-label">Name</label>
+          <input class="form-input" type="text" placeholder="Search by name…"
+                 [(ngModel)]="filters.name" (ngModelChange)="onFilterChange()" />
+        </div>
+        <div class="form-field">
+          <label class="form-label">Short name</label>
+          <input class="form-input" type="text" placeholder="Search by short name…"
+                 [(ngModel)]="filters.short_name" (ngModelChange)="onFilterChange()" />
+        </div>
+        <div class="form-field">
+          <label class="form-label">Pc name</label>
+          <input class="form-input" type="text" placeholder="Search by pc name…"
+                 [(ngModel)]="filters.pc_name" (ngModelChange)="onFilterChange()" />
+        </div>
       </div>
-      <div class="form-field">
-        <label class="form-label">Short name</label>
-        <input class="form-input" type="text" placeholder="Search by short name…"
-               [(ngModel)]="filters.short_name" (ngModelChange)="onFilterChange()" />
+        <div class="form-field form-field--inline">
+          <label class="form-label">Has assemly line</label>
+          <select class="form-select" [(ngModel)]="filters.hasAssigned" (ngModelChange)="onFilterChange()">
+            <option [ngValue]="null">All</option>
+            <option [ngValue]="true">Yes</option>
+            <option [ngValue]="false">No</option>
+          </select>
+        </div>
       </div>
-      <div class="form-field">
-        <label class="form-label">Pc name</label>
-        <input class="form-input" type="text" placeholder="Search by pc name…"
-               [(ngModel)]="filters.pc_name" (ngModelChange)="onFilterChange()" />
-      </div>
-      <div class="form-field form-field--inline">
-        <label class="form-label">Has assemly line</label>
-        <select class="form-select" [(ngModel)]="filters.hasAssigned" (ngModelChange)="onFilterChange()">
-          <option [ngValue]="null">All</option>
-          <option [ngValue]="true">Yes</option>
-          <option [ngValue]="false">No</option>
-        </select>
-      </div>
-    </div>
-    <ul class="w-list">
-      <li *ngFor="let product of filteredWorkstations"
-          class="w-list__item"
-          [class.p-list__item--selected]="selectedWorkstation?.id === product.id"
-          (dblclick)="onSelectWorkstation(product)">
-        <span class="w-list__name">{{ product.name }}</span>
-      </li>
-      <li *ngIf="filteredWorkstations.length === 0" class="p-list__empty">No products found</li>
-    </ul>
-  </aside>
+      <ul class="w-list">
+        <li *ngFor="let product of filteredWorkstations"
+            class="w-list__item"
+            [class.p-list__item--selected]="selectedWorkstation?.id === product.id"
+            (dblclick)="onSelectWorkstation(product)">
+          <span class="w-list__name">{{ product.name }}</span>
+        </li>
+        <li *ngIf="filteredWorkstations.length === 0" class="p-list__empty">No products found</li>
+      </ul>
+</aside>
   <!-- RIGHT PANEL -->
   <main class="w-detail">
     <section class="al-detail__section">
