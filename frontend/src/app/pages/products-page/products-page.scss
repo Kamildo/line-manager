@@ -9,8 +9,7 @@ $color-danger: #e05c5c;
 $color-success: #3ecf8e;
 $color-text: #e2e6f0;
 $color-text-muted: #6b7594;
-$color-text-dim: #3d4460;
-
+$color-text-dim: #6a718f ;//#464e6e ;//#3d4460;
 $radius-sm: 4px;
 $radius-md: 8px;
 
@@ -24,7 +23,13 @@ $sidebar-width: 480px;
   background: $color-bg;
   color: $color-text;
   font-family: 'DM Mono', 'Fira Mono', monospace;
-  font-size: 13px;
+  font-size: 14px;
+}
+aside {
+  &:first-child {
+    border-right: 2px solid #ccc;
+    padding-right: 1rem;
+  }
 }
 
 // ─── Sidebar ─────────────────────────────────────────────────────────────────
@@ -38,7 +43,7 @@ $sidebar-width: 480px;
 
   &__header {
     display: flex;
-    pign-items: center;
+    align-content: center;
     justify-content: space-between;
     padding: 20px 20px 16px;
     border-bottom: 1px solid $color-border;
@@ -48,7 +53,7 @@ $sidebar-width: 480px;
 
   &__title {
     margin: 0;
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 600;
     letter-spacing: 0.04em;
   }
@@ -120,7 +125,7 @@ $sidebar-width: 480px;
 }
 
 // ─── Badges ───────────────────────────────────────────────────────────────────
-.badge {
+/*.badge {
   display: inline-block;
   padding: 2px 8px;
   border-radius: $radius-sm;
@@ -143,7 +148,7 @@ $sidebar-width: 480px;
     background: rgba($color-accent, 0.12);
     color: $color-accent;
   }
-}
+}*/
 
 // ─── Detail Panel ─────────────────────────────────────────────────────────────
 .p-detail {
@@ -151,6 +156,7 @@ $sidebar-width: 480px;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  margin-left: 20px;
 
   &__section {
     padding: 24px 28px;
@@ -158,11 +164,11 @@ $sidebar-width: 480px;
 
     &-title {
       margin: 0 0 16px;
-      font-size: 11px;
+      font-size: 20px;
       font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: $color-text-muted;
+      color: white//$color-text-muted;
     }
   }
 
@@ -199,7 +205,7 @@ $sidebar-width: 480px;
 }
 
 // ─── Workstations List ────────────────────────────────────────────────────────
-.ws-list {
+/*.ws-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -252,7 +258,7 @@ $sidebar-width: 480px;
     font-size: 11px;
     color: $color-text-muted;
   }
-}
+}*/
 
 // ─── Form Primitives ─────────────────────────────────────────────────────────
 .form-field {
@@ -274,7 +280,8 @@ $sidebar-width: 480px;
 }
 
 .form-label {
-  font-size: 11px;
+  text-align: center;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.07em;
   text-transform: uppercase;

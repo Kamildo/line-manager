@@ -1,6 +1,6 @@
 <div class="w-page">
   <!-- LEFT PANEL -->
-  <aside class="w-sidebar">
+  <!--<aside class="w-sidebar">
     <header class="w-sidebar__header">
       <h2 class="w-sidebar__title">Workstations</h2>
     </header>
@@ -30,21 +30,67 @@
             <option [ngValue]="false">No</option>
           </select>
         </div>
+      </div>-->
+  <aside class="w-sidebar">
+    <header class="w-sidebar__header">
+      <h2 class="w-sidebar__title">Workstations</h2>
+    </header>
+
+    <div class="w-filters-grid">
+
+      <div class="form-field">
+        <label class="form-label">Name</label>
+        <input class="form-input"
+               type="text"
+               placeholder="Search by name…"
+               [(ngModel)]="filters.name"
+               (ngModelChange)="onFilterChange()" />
       </div>
-      <ul class="w-list">
-        <li *ngFor="let product of filteredWorkstations"
-            class="w-list__item"
-            [class.p-list__item--selected]="selectedWorkstation?.id === product.id"
-            (dblclick)="onSelectWorkstation(product)">
-          <span class="w-list__name">{{ product.name }}</span>
-        </li>
-        <li *ngIf="filteredWorkstations.length === 0" class="p-list__empty">No products found</li>
-      </ul>
-</aside>
+
+      <div class="form-field">
+        <label class="form-label">Has assembly line</label>
+        <select class="form-select"
+                [(ngModel)]="filters.hasAssigned"
+                (ngModelChange)="onFilterChange()">
+          <option [ngValue]="null">All</option>
+          <option [ngValue]="true">Yes</option>
+          <option [ngValue]="false">No</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Short name</label>
+        <input class="form-input"
+               type="text"
+               placeholder="Search by short name…"
+               [(ngModel)]="filters.short_name"
+               (ngModelChange)="onFilterChange()" />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Pc name</label>
+        <input class="form-input"
+               type="text"
+               placeholder="Search by pc name…"
+               [(ngModel)]="filters.pc_name"
+               (ngModelChange)="onFilterChange()" />
+      </div>
+
+    </div>
+    <ul class="w-list">
+      <li *ngFor="let product of filteredWorkstations"
+          class="w-list__item"
+          [class.p-list__item--selected]="selectedWorkstation?.id === product.id"
+          (dblclick)="onSelectWorkstation(product)">
+        <span class="w-list__name">{{ product.name }}</span>
+      </li>
+      <li *ngIf="filteredWorkstations.length === 0" class="p-list__empty">No products found</li>
+    </ul>
+  </aside>
   <!-- RIGHT PANEL -->
   <main class="w-detail">
-    <section class="al-detail__section">
-      <h3 class="al-detail__section-title">
+    <section class="w-detail__section">
+      <h3 class="w-detail__section-title">
         {{ selectedWorkstation ? 'Workstations Details' : 'Workstation' }}
       </h3>
       <div class="detail-form">
@@ -71,7 +117,7 @@
         </div>
       </div>
     </section>
-    <div class="al-detail__actions">
+    <div class="w-detail__actions">
       <ng-container *ngIf="!selectedWorkstation">
         <button class="btn btn--primary" (click)="onAddNew()">Add New</button>
         <button class="btn btn--ghost" (click)="onCancel()">Cancel</button>
@@ -87,8 +133,8 @@
       </ng-container>
     </div>
 
-    <section class="al-detail__section" *ngIf="selectedWorkstation">
-      <h3 class="al-detail__section-title">Assemly lines</h3>
+    <section class="w-detail__section" *ngIf="selectedWorkstation">
+      <h3 class="w-detail__section-title">Assemly lines</h3>
       <ul class="ws-list" *ngIf="selectedLines.length > 0; else noLines">
         <li *ngFor="let ws of selectedLines" class="ws-list__item">
           <span class="ws-list__name">{{ ws.name }}</span>
@@ -96,7 +142,7 @@
         </li>
       </ul>
       <ng-template #noLines>
-        <span class="al-detail__empty-text">No assemly lines assigned</span>
+        <span class="w-detail__empty-text">No assemly lines assigned</span>
       </ng-template>
     </section>
 

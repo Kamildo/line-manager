@@ -4,27 +4,27 @@
     <header class="p-sidebar__header">
       <h2 class="p-sidebar__title">Products</h2>
     </header>
-  <div class="p-filters">
-    <div class="form-field">
-      <label class="form-label">Name</label>
-      <input class="form-input" type="text" placeholder="Search by name…"
-             [(ngModel)]="filters.name" (ngModelChange)="onFilterChange()" />
+    <div class="p-filters">
+      <div class="form-field">
+        <label class="form-label">Name</label>
+        <input class="form-input" type="text" placeholder="Search by name…"
+               [(ngModel)]="filters.name" (ngModelChange)="onFilterChange()" />
+      </div>
     </div>
-  </div>
-  <ul class="p-list">
-    <li *ngFor="let product of filteredProducts"
-        class="p-list__item"
-        [class.p-list__item--selected]="selectedProduct?.id === product.id"
-        (dblclick)="onSelectProduct(product)">
-      <span class="p-list__name">{{ product.name }}</span>
-    </li>
-    <li *ngIf="filteredProducts.length === 0" class="p-list__empty">No products found</li>
-  </ul>
+    <ul class="p-list">
+      <li *ngFor="let product of filteredProducts"
+          class="p-list__item"
+          [class.p-list__item--selected]="selectedProduct?.id === product.id"
+          (dblclick)="onSelectProduct(product)">
+        <span class="p-list__name">{{ product.name }}</span>
+      </li>
+      <li *ngIf="filteredProducts.length === 0" class="p-list__empty">No products found</li>
+    </ul>
   </aside>
   <!-- RIGHT PANEL -->
   <main class="p-detail">
-    <section class="al-detail__section">
-      <h3 class="al-detail__section-title">
+    <section class="p-detail__section">
+      <h3 class="p-detail__section-title">
         {{ selectedProduct ? 'Products Details' : 'Product' }}
       </h3>
       <div class="detail-form">
@@ -37,7 +37,7 @@
         </div>
       </div>
     </section>
-    <div class="al-detail__actions">
+    <div class="p-detail__actions">
       <ng-container *ngIf="!selectedProduct">
         <button class="btn btn--primary" (click)="onAddNew()">Add New</button>
         <button class="btn btn--ghost" (click)="onCancel()">Cancel</button>
