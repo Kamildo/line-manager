@@ -66,7 +66,7 @@ $sidebar-width: 480px;
 
   &__row {
     display: flex;
-    gap: 12px;
+    gap: 22px;
 
     .form-field--inline {
       flex: 1;
@@ -274,12 +274,14 @@ $sidebar-width: 480px;
 }
 
 .form-label {
+  text-align: center;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.07em;
   text-transform: uppercase;
   color: $color-text-muted;
   white-space: nowrap;
+  margin: 5px;
 }
 
 .form-input, .form-select {

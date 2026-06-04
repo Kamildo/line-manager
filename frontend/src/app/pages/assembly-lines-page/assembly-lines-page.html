@@ -5,8 +5,8 @@
     <header class="al-sidebar__header">
       <h2 class="al-sidebar__title">Assembly Lines</h2>
     </header>
-
-    <div class="al-filters">
+    <div class="al-filters__row">
+      <!--<div class="al-filters">-->
       <div class="form-field">
         <label class="form-label">Name</label>
         <input class="form-input" type="text" placeholder="Search by name…"
@@ -17,41 +17,42 @@
         <input class="form-input" type="text" placeholder="Search by product…"
                [(ngModel)]="filters.productName" (ngModelChange)="onFilterChange()" />
       </div>
-      <div class="al-filters__row">
-        <div class="form-field form-field--inline">
-          <label class="form-label">Active</label>
-          <select class="form-select" [(ngModel)]="filters.active" (ngModelChange)="onFilterChange()">
-            <option [ngValue]="null">All</option>
-            <option [ngValue]="true">Yes</option>
-            <option [ngValue]="false">No</option>
-          </select>
-        </div>
-        <div class="form-field form-field--inline">
-          <label class="form-label">Has workstations</label>
-          <select class="form-select" [(ngModel)]="filters.hasAssigned" (ngModelChange)="onFilterChange()">
-            <option [ngValue]="null">All</option>
-            <option [ngValue]="true">Yes</option>
-            <option [ngValue]="false">No</option>
-          </select>
-        </div>
-      </div>
     </div>
+        <div class="al-filters__row">
+          <div class="form-field form-field--inline">
+            <label class="form-label">Active</label>
+            <select class="form-select" [(ngModel)]="filters.active" (ngModelChange)="onFilterChange()">
+              <option [ngValue]="null">All</option>
+              <option [ngValue]="true">Yes</option>
+              <option [ngValue]="false">No</option>
+            </select>
+          </div>
+          <div class="form-field form-field--inline">
+            <label class="form-label">Has workstations</label>
+            <select class="form-select" [(ngModel)]="filters.hasAssigned" (ngModelChange)="onFilterChange()">
+              <option [ngValue]="null">All</option>
+              <option [ngValue]="true">Yes</option>
+              <option [ngValue]="false">No</option>
+            </select>
+          </div>
+        </div>
+      <!--</div>-->
 
-    <ul class="al-list">
-      <li *ngFor="let line of filteredLines"
-          class="al-list__item"
-          [class.al-list__item--selected]="selectedLine?.id === line.id"
-          (dblclick)="onSelectLine(line)">
-        <span class="al-list__name">{{ line.name }}</span>
-        <span class="al-list__badges">
-          <span class="badge" [class.badge--active]="line.active" [class.badge--inactive]="!line.active">
-            {{ line.active ? 'Active' : 'Inactive' }}
+      <ul class="al-list">
+        <li *ngFor="let line of filteredLines"
+            class="al-list__item"
+            [class.al-list__item--selected]="selectedLine?.id === line.id"
+            (dblclick)="onSelectLine(line)">
+          <span class="al-list__name">{{ line.name }}</span>
+          <span class="al-list__badges">
+            <span class="badge" [class.badge--active]="line.active" [class.badge--inactive]="!line.active">
+              {{ line.active ? 'Active' : 'Inactive' }}
+            </span>
+            <span *ngIf="line.product_name" class="badge badge--product">{{ line.product_name }}</span>
           </span>
-          <span *ngIf="line.product_name" class="badge badge--product">{{ line.product_name }}</span>
-        </span>
-      </li>
-      <li *ngIf="filteredLines.length === 0" class="al-list__empty">No assembly lines found</li>
-    </ul>
+        </li>
+        <li *ngIf="filteredLines.length === 0" class="al-list__empty">No assembly lines found</li>
+      </ul>
   </aside>
 
   <!-- RIGHT PANEL -->

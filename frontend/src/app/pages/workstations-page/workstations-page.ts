@@ -1,9 +1,162 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { environment } from '../../../environments/environment';
+
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+export interface Workstation {
+  id: number;
+  name: string;
+  short_name: string;
+  pc_name: string;
+}
+interface Filters {
+  name: string;
+  short_name: string;
+  pc_name: string;
+  hasAssigned: boolean | null;
+}
+
+interface EditForm {
+  name: string;
+  short_name: string;
+  pc_name: string;
+}
+
+export interface AssemblyLine {
+  id: number;
+  name: string;
+  active: boolean;
+ // product_id: number | null;
+//  product_name?: string;
+//  has_workstations?: number; // 0 | 1 from DB
+}
 
 @Component({
   selector: 'app-workstations-page',
-  imports: [],
+  imports: [CommonModule, FormsModule],
+  standalone: true,
   templateUrl: './workstations-page.html',
   styleUrl: './workstations-page.scss',
 })
-export class WorkstationsPage {}
+
+export class WorkstationsPage implements OnInit {
+  allWorkstation: Workstation[] = [];
+  filteredWorkstations: Workstation[] = [];
+  isEditing = false;
+  selectedWorkstation: Workstation | null = null;
+  selectedLines: AssemblyLine[] = [];
+  filters: Filters = { name: '', short_name: '', pc_name: '', hasAssigned: null }
+  editForm: EditForm = { name: '', short_name: '', pc_name: '' }
+
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
+
+  ngOnInit(): void {
+    this.loadInitialData();
+  }
+  // ── Data ───────────────────────────────────────────────────────────────────
+
+  private loadInitialData(): void {
+    this.http.get<Workstation[]>(`${environment.apiUrl}/api/workstations`).subscribe({
+      next: (data) => {
+        this.allWorkstation = data;
+        this.cdr.markForCheck();
+        this.applyFilters();
+      },
+      error: (e) => console.error('workstations:', e),
+    });
+  }
+  // ── Filtering ──────────────────────────────────────────────────────────────
+
+  onFilterChange(): void { this.applyFilters(); }
+
+  private applyFilters(): void {
+    this.filteredWorkstations = this.allWorkstation.filter(w => {
+      if (this.filters.name && !w.name.toLowerCase().includes(this.filters.name.toLowerCase())) return false;
+      if (this.filters.short_name && !w.short_name.toLowerCase().includes(this.filters.short_name.toLowerCase())) return false;
+      if (this.filters.pc_name && !w.pc_name.toLowerCase().includes(this.filters.pc_name.toLowerCase())) return false;
+    //  if (this.filters.hasAssigned !== null && !!w.assigned !== this.filters.hasAssigned) return false;
+      //      if (this.filters.hasAssigned !== null && Boolean(l.has_workstations) !== this.filters.hasAssigned) return false;
+    //  if (this.filters.hasAssigned !== null) ) return false;
+      return true;
+    });
+  }
+
+  // ── Selection ──────────────────────────────────────────────────────────────
+
+  onSelectWorkstation(workstation: Workstation): void {
+    this.selectedWorkstation = workstation;
+    this.isEditing = false;
+    this.editForm = { name: workstation.name, short_name: workstation.short_name, pc_name: workstation.pc_name };
+  }
+  // ── CRUD ───────────────────────────────────────────────────────────────────
+
+  onEdit(): void {
+    if (!this.selectedWorkstation) return;
+    this.isEditing = true;
+    this.editForm = { name: this.selectedWorkstation.name, short_name: this.selectedWorkstation.short_name, pc_name: this.selectedWorkstation.pc_name };
+  }
+
+  onAddNew(): void {
+    if (this.editForm.name == '') {
+      return alert('Name is required');
+    }
+    else if (this.selectedWorkstation && !this.isEditing) {
+      this.selectedWorkstation = null;
+      return;
+    }
+    const body = { name: this.editForm.name, product_id: null };
+    this.http.post<Workstation>(`${environment.apiUrl}/api/products`, body).subscribe({
+      next: () => {
+        this.selectedWorkstation = null;
+        this.editForm = { name: '', short_name: '', pc_name: '' };
+        // this.reloadProducts();
+      },
+      error: (e) => console.error('add new:', e),
+    });
+  }
+
+  onSave(): void {
+    const body = { name: this.editForm.name, short_name: this.editForm.short_name, pc_name: this.editForm.pc_name };
+    console.log('created:', 'start');
+    if (this.isEditing && this.selectedWorkstation) {
+      const id = this.selectedWorkstation.id;
+      this.http.put(`${environment.apiUrl}/api/workstations/${id}`, body).subscribe({
+        next: () => {
+          this.isEditing = false;
+          //  this.reloadProducts();
+        },
+        error: (e) => console.error('save edit:', e),
+      });
+    }
+  }
+
+  onDelete(): void {
+    if (!this.selectedWorkstation) return;
+    if (!confirm(`Delete "${this.selectedWorkstation.name}"?`)) return;
+    this.http.delete(`${environment.apiUrl}/api/workstations/${this.selectedWorkstation.id}`).subscribe({
+      next: () => {
+        this.selectedWorkstation = null;
+        this.editForm = { name: '', short_name: '', pc_name: '' };
+        // this.reloadProducts();
+        this.cdr.markForCheck();
+      },
+      error: (e) => console.error('delete:', e),
+    });
+  }
+
+  onCancel(): void {
+    // restore form to selectedWorkstation if one exists, else blank
+    if (this.selectedWorkstation) {
+      this.editForm = { name: this.selectedWorkstation.name, short_name: this.selectedWorkstation.short_name, pc_name: this.selectedWorkstation.pc_name };
+      this.isEditing = false;
+    }
+    else {
+      this.editForm = { name: '', short_name: '', pc_name: '' };
+      this.isEditing = false;
+    }
+  }
+
+}
