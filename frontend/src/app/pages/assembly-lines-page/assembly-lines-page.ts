@@ -181,14 +181,16 @@ export class AssemblyLinesPage implements OnInit {
 
   onDelete(): void {
     if (!this.selectedLine) return;
-    if (!confirm(`Delete "${this.selectedLine.name}"?`)) return;
-    this.http.delete(`${environment.apiUrl}/api/assembly_lines/${this.selectedLine.id}`).subscribe({
-      next: () => {
+    if (this.selectedWorkstations.length > 0) {
+      if (!confirm(`Assemly line "${this.selectedLine.name}" is assigned to ${this.selectedWorkstations.length} workstations. Do you wish to continue?`)) return;
+    }
+    else if (!confirm(`Delete "${this.selectedLine.name}"?`)) return;
+    this.http.delete(`${environment.apiUrl}/api/assembly_lines/workstations_assembly_line_unassign_all_and_delete/${this.selectedLine.id}`).subscribe({
+    next: () => {
         this.selectedLine = null;
         this.selectedWorkstations = [];
         this.editForm = { name: '', active: true, productId: null };
         this.reloadLines();
-        this.cdr.markForCheck();
       },
       error: (e) => console.error('delete:', e),
     });

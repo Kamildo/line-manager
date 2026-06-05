@@ -15,6 +15,7 @@ $radius-sm: 4px;
 $radius-md: 8px;
 
 $sidebar-width: 480px;
+@use "sass:color";
 
 // ─── Layout ──────────────────────────────────────────────────────────────────
 .w-page {
@@ -92,16 +93,25 @@ $sidebar-width: 480px;
 
 // ─── List ─────────────────────────────────────────────────────────────────────
 .w-list {
-  list-style: none;
   margin: 0;
   padding: 8px 0;
   overflow-y: auto;
   flex: 1;
 
+  .w-list__header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ccc;
+    gap: 10px;
+  }
+
   &__item {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    align-items: center;
+    gap: 10px;
     padding: 10px 20px;
     cursor: pointer;
     border-left: 2px solid transparent;
@@ -117,16 +127,6 @@ $sidebar-width: 480px;
     }
   }
 
-  &__name {
-    font-weight: 500;
-  }
-
-  &__badges {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-
   &__empty {
     padding: 24px 20px;
     color: $color-text-muted;
@@ -135,31 +135,7 @@ $sidebar-width: 480px;
   }
 }
 
-// ─── Badges ───────────────────────────────────────────────────────────────────
-/*.badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: $radius-sm;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
 
-  &--active {
-    background: rgba($color-success, 0.15);
-    color: $color-success;
-  }
-
-  &--inactive {
-    background: rgba($color-text-muted, 0.12);
-    color: $color-text-muted;
-  }
-
-  &--product {
-    background: rgba($color-accent, 0.12);
-    color: $color-accent;
-  }
-}*/
 
 // ─── Detail Panel ─────────────────────────────────────────────────────────────
 .w-detail {
@@ -215,62 +191,6 @@ $sidebar-width: 480px;
   max-width: 480px;
 }
 
-// ─── Workstations List ────────────────────────────────────────────────────────
-/*.ws-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-
-  &__item {
-    display: grid;
-    grid-template-columns: 28px 1fr auto auto;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    background: $color-surface-2;
-    border: 1px solid $color-border;
-    border-radius: $radius-md;
-    transition: border-color 0.12s;
-
-    &:hover {
-      border-color: $color-accent;
-    }
-  }
-
-  &__order {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: $color-accent-dim;
-    color: $color-accent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 700;
-  }
-
-  &__name {
-    font-weight: 500;
-  }
-
-  &__short {
-    font-size: 11px;
-    color: $color-text-muted;
-    background: $color-surface;
-    padding: 2px 6px;
-    border-radius: $radius-sm;
-  }
-
-  &__pc {
-    font-size: 11px;
-    color: $color-text-muted;
-  }
-}
-*/
 // ─── Form Primitives ─────────────────────────────────────────────────────────
 .form-field {
   display: flex;
@@ -370,7 +290,7 @@ $sidebar-width: 480px;
     color: #fff;
 
     &:hover {
-      background: lighten($color-accent, 8%);
+      color: color.adjust($color-accent, $lightness: 8%); 
     }
   }
 

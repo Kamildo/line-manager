@@ -12,8 +12,8 @@ $color-text-muted: #6b7594;
 $color-text-dim: #6a718f ;//#464e6e;//#3d4460;
 $radius-sm: 4px;
 $radius-md: 8px;
-
 $sidebar-width: 480px;
+@use "sass:color";
 
 // ─── Layout ──────────────────────────────────────────────────────────────────
 .al-page {
@@ -372,7 +372,7 @@ $sidebar-width: 480px;
     color: #fff;
 
     &:hover {
-      background: lighten($color-accent, 8%);
+      background: color.scale($color-accent, $lightness: 8%);
     }
   }
 

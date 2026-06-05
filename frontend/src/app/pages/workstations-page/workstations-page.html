@@ -1,36 +1,5 @@
 <div class="w-page">
   <!-- LEFT PANEL -->
-  <!--<aside class="w-sidebar">
-    <header class="w-sidebar__header">
-      <h2 class="w-sidebar__title">Workstations</h2>
-    </header>
-    <div class="w-filters">
-      <div class="al-filters__row">
-        <div class="form-field">
-          <label class="form-label">Name</label>
-          <input class="form-input" type="text" placeholder="Search by name…"
-                 [(ngModel)]="filters.name" (ngModelChange)="onFilterChange()" />
-        </div>
-        <div class="form-field">
-          <label class="form-label">Short name</label>
-          <input class="form-input" type="text" placeholder="Search by short name…"
-                 [(ngModel)]="filters.short_name" (ngModelChange)="onFilterChange()" />
-        </div>
-        <div class="form-field">
-          <label class="form-label">Pc name</label>
-          <input class="form-input" type="text" placeholder="Search by pc name…"
-                 [(ngModel)]="filters.pc_name" (ngModelChange)="onFilterChange()" />
-        </div>
-      </div>
-        <div class="form-field form-field--inline">
-          <label class="form-label">Has assemly line</label>
-          <select class="form-select" [(ngModel)]="filters.hasAssigned" (ngModelChange)="onFilterChange()">
-            <option [ngValue]="null">All</option>
-            <option [ngValue]="true">Yes</option>
-            <option [ngValue]="false">No</option>
-          </select>
-        </div>
-      </div>-->
   <aside class="w-sidebar">
     <header class="w-sidebar__header">
       <h2 class="w-sidebar__title">Workstations</h2>
@@ -77,15 +46,26 @@
       </div>
 
     </div>
-    <ul class="w-list">
-      <li *ngFor="let product of filteredWorkstations"
-          class="w-list__item"
-          [class.p-list__item--selected]="selectedWorkstation?.id === product.id"
-          (dblclick)="onSelectWorkstation(product)">
-        <span class="w-list__name">{{ product.name }}</span>
-      </li>
-      <li *ngIf="filteredWorkstations.length === 0" class="p-list__empty">No products found</li>
-    </ul>
+    <div class="w-list">
+      <div class="w-list__header">
+        <span>Name</span>
+        <span>Short Name</span>
+        <span>PC Name</span>
+      </div>
+
+      <div *ngFor="let workstation of filteredWorkstations"
+           class="w-list__item"
+           [class.w-list__item--selected]="selectedWorkstation?.id === workstation.id"
+           (dblclick)="onSelectWorkstation(workstation)">
+        <span>{{ workstation.name }}</span>
+        <span>{{ workstation.short_name }}</span>
+        <span>{{ workstation.pc_name }}</span>
+      </div>
+
+      <div *ngIf="filteredWorkstations.length === 0" class="w-list__empty">
+        No workstations found
+      </div>
+    </div>
   </aside>
   <!-- RIGHT PANEL -->
   <main class="w-detail">
@@ -132,19 +112,25 @@
         <button class="btn btn--ghost" (click)="onCancel()">Cancel</button>
       </ng-container>
     </div>
-
-    <section class="w-detail__section" *ngIf="selectedWorkstation">
-      <h3 class="w-detail__section-title">Assemly lines</h3>
-      <ul class="ws-list" *ngIf="selectedLines.length > 0; else noLines">
-        <li *ngFor="let ws of selectedLines" class="ws-list__item">
-          <span class="ws-list__name">{{ ws.name }}</span>
-          <span class="ws-list__short">{{ ws.active }}</span>
-        </li>
-      </ul>
-      <ng-template #noLines>
-        <span class="w-detail__empty-text">No assemly lines assigned</span>
-      </ng-template>
-    </section>
-
-  </main>
+    <div class="w-list" *ngIf="selectedWorkstation">
+    <h3 class="w-detail__section-title">Assemly lines</h3>
+    <div class="w-list__header">
+      <span>Name</span>
+      <span>Active</span>
+      <span>Product</span>
+      </div>
+        <ul class="w-list" *ngIf="selectedLines.length > 0; else noLines">
+          <li *ngFor="let al of selectedLines" class="w-list__item">
+            <span class="al-list__name">{{ al.name }}</span>
+              <span class="badge" [class.badge--active]="al.active" [class.badge--inactive]="!al.active">
+                {{ al.active ? 'Active' : 'Inactive' }}
+              </span>
+            <span class="al-list__product_name">{{ al.product_name }}</span>
+          </li>
+        </ul>
+        <ng-template #noLines>
+          <span class="w-detail__empty-text">No assembly lines assigned</span>
+        </ng-template>
+</div>
+</main>
 </div>

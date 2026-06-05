@@ -84,12 +84,12 @@ export class ProductsPage implements OnInit {
       this.selectedProduct = null;
       return;
     }
-    const body = { name: this.editForm.name, product_id: null };
+    const body = { name: this.editForm.name };
     this.http.post<Product>(`${environment.apiUrl}/api/products`, body).subscribe({
       next: () => {
         this.selectedProduct = null;
         this.editForm = { name: '' };
-       // this.reloadProducts();
+        this.loadInitialData();
       },
       error: (e) => console.error('add new:', e),
     });
@@ -97,13 +97,12 @@ export class ProductsPage implements OnInit {
 
   onSave(): void {
     const body = { name: this.editForm.name };
-    console.log('created:', 'start');
     if (this.isEditing && this.selectedProduct) {
       const id = this.selectedProduct.id;
       this.http.put(`${environment.apiUrl}/api/products/${id}`, body).subscribe({
         next: () => {
           this.isEditing = false;
-        //  this.reloadProducts();
+          this.loadInitialData();
         },
         error: (e) => console.error('save edit:', e),
       });
@@ -117,8 +116,7 @@ export class ProductsPage implements OnInit {
       next: () => {
         this.selectedProduct = null;
         this.editForm = { name: '' };
-       // this.reloadProducts();
-        this.cdr.markForCheck();
+        this.loadInitialData();
       },
       error: (e) => console.error('delete:', e),
     });

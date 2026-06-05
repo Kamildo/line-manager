@@ -29,9 +29,7 @@ export interface AssemblyLine {
   id: number;
   name: string;
   active: boolean;
- // product_id: number | null;
-//  product_name?: string;
-//  has_workstations?: number; // 0 | 1 from DB
+  product_name?: string;
 }
 
 @Component({
@@ -68,6 +66,13 @@ export class WorkstationsPage implements OnInit {
       error: (e) => console.error('workstations:', e),
     });
   }
+  //'/api/workstations/:id/assembly_lines'
+  private loadAssemlyLines(workstationId: number): void {
+    this.http.get<AssemblyLine[]>(`${environment.apiUrl}/api/workstations/${workstationId}/assembly_lines`).subscribe({
+      next: (data) => { this.selectedLines = data; this.cdr.markForCheck(); },
+      error: (e) => console.error('assembly lines:', e),
+    });
+  }
   // ── Filtering ──────────────────────────────────────────────────────────────
 
   onFilterChange(): void { this.applyFilters(); }
@@ -77,12 +82,12 @@ export class WorkstationsPage implements OnInit {
       if (this.filters.name && !w.name.toLowerCase().includes(this.filters.name.toLowerCase())) return false;
       if (this.filters.short_name && !w.short_name.toLowerCase().includes(this.filters.short_name.toLowerCase())) return false;
       if (this.filters.pc_name && !w.pc_name.toLowerCase().includes(this.filters.pc_name.toLowerCase())) return false;
-    //  if (this.filters.hasAssigned !== null && !!w.assigned !== this.filters.hasAssigned) return false;
-      //      if (this.filters.hasAssigned !== null && Boolean(l.has_workstations) !== this.filters.hasAssigned) return false;
-    //  if (this.filters.hasAssigned !== null) ) return false;
       return true;
     });
   }
+  //  if (this.filters.hasAssigned !== null && !!w.assigned !== this.filters.hasAssigned) return false;
+  //  if (this.filters.hasAssigned !== null && Boolean(l.has_workstations) !== this.filters.hasAssigned) return false;
+  //  if (this.filters.hasAssigned !== null) ) return false;
 
   // ── Selection ──────────────────────────────────────────────────────────────
 
@@ -90,6 +95,7 @@ export class WorkstationsPage implements OnInit {
     this.selectedWorkstation = workstation;
     this.isEditing = false;
     this.editForm = { name: workstation.name, short_name: workstation.short_name, pc_name: workstation.pc_name };
+    this.loadAssemlyLines(workstation.id);
   }
   // ── CRUD ───────────────────────────────────────────────────────────────────
 
@@ -107,12 +113,12 @@ export class WorkstationsPage implements OnInit {
       this.selectedWorkstation = null;
       return;
     }
-    const body = { name: this.editForm.name, product_id: null };
-    this.http.post<Workstation>(`${environment.apiUrl}/api/products`, body).subscribe({
+    const body = { name: this.editForm.name, short_name: this.editForm.short_name, pc_name: this.editForm.pc_name };
+    this.http.post<Workstation>(`${environment.apiUrl}/api/workstations`, body).subscribe({
       next: () => {
         this.selectedWorkstation = null;
         this.editForm = { name: '', short_name: '', pc_name: '' };
-        // this.reloadProducts();
+        this.loadInitialData();
       },
       error: (e) => console.error('add new:', e),
     });
@@ -120,13 +126,12 @@ export class WorkstationsPage implements OnInit {
 
   onSave(): void {
     const body = { name: this.editForm.name, short_name: this.editForm.short_name, pc_name: this.editForm.pc_name };
-    console.log('created:', 'start');
     if (this.isEditing && this.selectedWorkstation) {
       const id = this.selectedWorkstation.id;
       this.http.put(`${environment.apiUrl}/api/workstations/${id}`, body).subscribe({
         next: () => {
           this.isEditing = false;
-          //  this.reloadProducts();
+          this.loadInitialData();
         },
         error: (e) => console.error('save edit:', e),
       });
@@ -135,13 +140,17 @@ export class WorkstationsPage implements OnInit {
 
   onDelete(): void {
     if (!this.selectedWorkstation) return;
-    if (!confirm(`Delete "${this.selectedWorkstation.name}"?`)) return;
-    this.http.delete(`${environment.apiUrl}/api/workstations/${this.selectedWorkstation.id}`).subscribe({
-      next: () => {
+    // check if workstation is assigned to any assembly lines, if so alert user and get confirmation to unassign before deleting
+    if (this.selectedLines.length > 0)
+    {
+      if (!confirm(`Workstation "${this.selectedWorkstation.name}" is assigned to ${this.selectedLines.length} assembly lines. Do you wish to continue?`)) return;
+    }
+    else if (!confirm(`Delete "${this.selectedWorkstation.name}"?`)) return;
+    this.http.delete(`${environment.apiUrl}/api/workstations/workstations_assembly_line_unassign_all_and_delete/${this.selectedWorkstation.id}`).subscribe({
+    next: () => {
         this.selectedWorkstation = null;
         this.editForm = { name: '', short_name: '', pc_name: '' };
-        // this.reloadProducts();
-        this.cdr.markForCheck();
+        this.loadInitialData();
       },
       error: (e) => console.error('delete:', e),
     });
