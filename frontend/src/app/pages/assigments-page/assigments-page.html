@@ -31,12 +31,13 @@
         </ul>
         }
       </div>
-
     </div>
+    @if (!auth.isReadonly()) {
     <div class="button-row">
       <button [disabled]="!pendingChangesProduct" (click)="confirmProductAssign()">Confirm</button>
       <button [disabled]="!pendingChangesProduct" (click)="discardProduct()">Discard</button>
     </div>
+    }
   </div>
 
   <!-- RIGHT GROUP: Assembly Lines <-> Workstations -->
@@ -88,24 +89,26 @@
         </ul>
         }
       </div>
-
     </div>
 
+    @if (!auth.isReadonly()){
     <div class="button-row">
       <button [disabled]="!pendingChangesAL" (click)="confirmWSAssign()">Confirm</button>
       <button [disabled]="!pendingChangesAL" (click)="discardAL()">Discard</button>
     </div>
+    }
 
-    @if (dialogSide  !== null) {
-    <div class="dialog-overlay">
-      <div class="dialog">
-        <p>You have unsaved changes. Confirm or discard before switching.</p>
-        <div class="dialog-actions">
-          <button (click)="dialogConfirm()">Confirm</button>
-          <button (click)="dialogDiscard()">Discard</button>
-        </div>
+  </div>
+  @if (!auth.isReadonly() && dialogSide  !== null) {
+  <div class="dialog-overlay">
+    <div class="dialog">
+      <p>You have unsaved changes. Confirm or discard before switching.</p>
+      <div class="dialog-actions">
+        <button (click)="dialogConfirm()">Confirm</button>
+        <button (click)="dialogDiscard()">Discard</button>
       </div>
     </div>
-    }
   </div>
+  }
 
+</div>

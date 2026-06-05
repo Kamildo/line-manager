@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../../environments/environment';
-
+import { AuthService } from '../../services/auth.service';
 // ─── Models ──────────────────────────────────────────────────────────────────
 
 export interface Product {
@@ -65,7 +65,7 @@ export class AssemblyLinesPage implements OnInit {
   filters: Filters = { name: '', productName: '', active: null, hasAssigned: null };
   editForm: EditForm = { name: '', active: true, productId: null };
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, public auth: AuthService) { }
 
   ngOnInit(): void {
     this.loadInitialData();

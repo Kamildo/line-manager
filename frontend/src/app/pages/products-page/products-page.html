@@ -37,6 +37,7 @@
         </div>
       </div>
     </section>
+    @if (!auth.isReadonly()){
     <div class="p-detail__actions">
       <ng-container *ngIf="!selectedProduct">
         <button class="btn btn--primary" (click)="onAddNew()">Add New</button>
@@ -44,7 +45,9 @@
       </ng-container>
       <ng-container *ngIf="selectedProduct && !isEditing">
         <button class="btn btn--secondary" (click)="onEdit()">Edit</button>
+        @if (auth.isAdmin()){
         <button class="btn btn--danger" (click)="onDelete()">Delete</button>
+        }
         <button class="btn btn--primary" (click)="onAddNew()">Add New</button>
       </ng-container>
       <ng-container *ngIf="isEditing">
@@ -52,5 +55,6 @@
         <button class="btn btn--ghost" (click)="onCancel()">Cancel</button>
       </ng-container>
     </div>
+    }
   </main>
 </div>

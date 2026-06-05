@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../../environments/environment';
-
+import { AuthService } from '../../services/auth.service';
 interface Product { id: number; name: string; }
 interface AssemblyLine { id: number; name: string; product_id: number | null; }
 interface Workstation { id: number; name: string; order_index?: number; }
@@ -37,6 +37,9 @@ export class AssigmentsPage {
   dialogSide: 'product' | 'al' | null = null;
   pendingProductSwitch: number | null = null;
   pendingALSwitch: number | null = null;
+
+
+  constructor(public auth: AuthService) { }
 
   ngOnInit() {
     this.http.get<Product[]>(`${environment.apiUrl}/api/products`).subscribe({

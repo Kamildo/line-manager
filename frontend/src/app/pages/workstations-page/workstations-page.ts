@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../../environments/environment';
-
+import { AuthService } from '../../services/auth.service';
 // ─── Models ──────────────────────────────────────────────────────────────────
 
 export interface Workstation {
@@ -49,7 +49,7 @@ export class WorkstationsPage implements OnInit {
   filters: Filters = { name: '', short_name: '', pc_name: '', hasAssigned: null }
   editForm: EditForm = { name: '', short_name: '', pc_name: '' }
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, public auth: AuthService) { }
 
   ngOnInit(): void {
     this.loadInitialData();

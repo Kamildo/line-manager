@@ -1,1 +1,31 @@
-<p>login-page works!</p>
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>LINE MANAGER</h1>
+    </div>
+
+    <!-- DEV ONLY: remove before production -->
+    <div class="quick-login">
+      <p class="quick-label">TEST ACCOUNTS</p>
+      <div class="quick-buttons">
+        <button (click)="fillCredentials('admin', 'admin')">ADMIN</button>
+        <button (click)="fillCredentials('user', 'user')">USER</button>
+        <button (click)="fillCredentials('guest', 'guest')">GUEST</button>
+      </div>
+    </div>
+    <!-- END DEV ONLY -->
+
+    <div class="login-form">
+      <div class="field">
+        <label>USERNAME</label>
+        <input [(ngModel)]="username" type="text" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label>PASSWORD</label>
+        <input [(ngModel)]="password" type="password" />
+      </div>
+      <p class="error" *ngIf="error">{{ error }}</p>
+      <button class="submit-btn" (click)="login()">LOG IN</button>
+    </div>
+  </div>
+</div>

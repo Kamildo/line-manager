@@ -17,38 +17,7 @@ export class App implements OnInit {
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
 
-  loadProducts() {
-    this.http.get<any[]>(`${environment.apiUrl}/api/products`).subscribe({
-      next: (data) => {
-        this.items = data;
-        this.cdr.markForCheck();
-      },
-      error: (e) => console.log('Error:', e)
-    });
-  }
-
-  loadAssembly_lines() {
-    this.http.get<any[]>(`${environment.apiUrl}/api/assembly_lines`).subscribe({
-      next: (data) => {
-        this.items = data;
-        this.cdr.markForCheck();
-      },
-      error: (e) => console.log('Error:', e)
-    });
-  }
-  
-  loadWorkstations() {
-    this.http.get<any[]>(`${environment.apiUrl}/api/workstations`).subscribe({
-      next: (data) => {
-        this.items = data;
-        this.cdr.markForCheck();
-      },
-      error: (e) => console.log('Error:', e)
-    });
-  }
-
   ngOnInit() {
-    this.loadProducts();
   }
 
  

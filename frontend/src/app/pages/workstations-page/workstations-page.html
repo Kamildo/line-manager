@@ -97,6 +97,7 @@
         </div>
       </div>
     </section>
+    @if (!auth.isReadonly()){
     <div class="w-detail__actions">
       <ng-container *ngIf="!selectedWorkstation">
         <button class="btn btn--primary" (click)="onAddNew()">Add New</button>
@@ -104,7 +105,9 @@
       </ng-container>
       <ng-container *ngIf="selectedWorkstation && !isEditing">
         <button class="btn btn--secondary" (click)="onEdit()">Edit</button>
+        @if (auth.isAdmin()){
         <button class="btn btn--danger" (click)="onDelete()">Delete</button>
+        }
         <button class="btn btn--primary" (click)="onAddNew()">Add New</button>
       </ng-container>
       <ng-container *ngIf="isEditing">
@@ -112,25 +115,26 @@
         <button class="btn btn--ghost" (click)="onCancel()">Cancel</button>
       </ng-container>
     </div>
+    }
     <div class="w-list" *ngIf="selectedWorkstation">
-    <h3 class="w-detail__section-title">Assemly lines</h3>
-    <div class="w-list__header">
-      <span>Name</span>
-      <span>Active</span>
-      <span>Product</span>
+      <h3 class="w-detail__section-title">Assemly lines</h3>
+      <div class="w-list__header">
+        <span>Name</span>
+        <span>Active</span>
+        <span>Product</span>
       </div>
-        <ul class="w-list" *ngIf="selectedLines.length > 0; else noLines">
-          <li *ngFor="let al of selectedLines" class="w-list__item">
-            <span class="al-list__name">{{ al.name }}</span>
-              <span class="badge" [class.badge--active]="al.active" [class.badge--inactive]="!al.active">
-                {{ al.active ? 'Active' : 'Inactive' }}
-              </span>
-            <span class="al-list__product_name">{{ al.product_name }}</span>
-          </li>
-        </ul>
-        <ng-template #noLines>
-          <span class="w-detail__empty-text">No assembly lines assigned</span>
-        </ng-template>
-</div>
-</main>
+      <ul class="w-list" *ngIf="selectedLines.length > 0; else noLines">
+        <li *ngFor="let al of selectedLines" class="w-list__item">
+          <span class="al-list__name">{{ al.name }}</span>
+          <span class="badge" [class.badge--active]="al.active" [class.badge--inactive]="!al.active">
+            {{ al.active ? 'Active' : 'Inactive' }}
+          </span>
+          <span class="al-list__product_name">{{ al.product_name }}</span>
+        </li>
+      </ul>
+      <ng-template #noLines>
+        <span class="w-detail__empty-text">No assembly lines assigned</span>
+      </ng-template>
+    </div>
+  </main>
 </div>
