@@ -28,7 +28,7 @@ export interface AssemblyLine {
   active: boolean;
   product_id: number | null;
   product_name?: string;
-  has_workstations?: number; // 0 | 1 from DB
+  has_workstations: number; // 0 | 1 from DB
 }
 
 interface Filters {

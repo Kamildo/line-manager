@@ -11,6 +11,7 @@ export interface Workstation {
   name: string;
   short_name: string;
   pc_name: string;
+  has_assembly_lines: number | null;
 }
 interface Filters {
   name: string;
@@ -57,8 +58,9 @@ export class WorkstationsPage implements OnInit {
   // ── Data ───────────────────────────────────────────────────────────────────
 
   private loadInitialData(): void {
-    this.http.get<Workstation[]>(`${environment.apiUrl}/api/workstations`).subscribe({
+    this.http.get<Workstation[]>(`${environment.apiUrl}/api/workstations_with_assembly_lines_flag`).subscribe({
       next: (data) => {
+        console.log('workstations with lines flag:', data);
         this.allWorkstation = data;
         this.cdr.markForCheck();
         this.applyFilters();
@@ -82,13 +84,11 @@ export class WorkstationsPage implements OnInit {
       if (this.filters.name && !w.name.toLowerCase().includes(this.filters.name.toLowerCase())) return false;
       if (this.filters.short_name && !w.short_name.toLowerCase().includes(this.filters.short_name.toLowerCase())) return false;
       if (this.filters.pc_name && !w.pc_name.toLowerCase().includes(this.filters.pc_name.toLowerCase())) return false;
+      //if (this.filters.hasAssigned !== null && Boolean(l.has_workstations) !== this.filters.hasAssigned) return false;
+      if (this.filters.hasAssigned !== null && Boolean(w.has_assembly_lines) !== this.filters.hasAssigned) return false;
       return true;
     });
   }
-  //  if (this.filters.hasAssigned !== null && !!w.assigned !== this.filters.hasAssigned) return false;
-  //  if (this.filters.hasAssigned !== null && Boolean(l.has_workstations) !== this.filters.hasAssigned) return false;
-  //  if (this.filters.hasAssigned !== null) ) return false;
-
   // ── Selection ──────────────────────────────────────────────────────────────
 
   onSelectWorkstation(workstation: Workstation): void {

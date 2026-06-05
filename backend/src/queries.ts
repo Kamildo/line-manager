@@ -97,6 +97,17 @@ router.delete('/api/workstations/:id', requireAdmin, safe((req: Request, res: Re
     res.json({ success: true });
 }));
 
+router.get('/api/workstations_with_assembly_lines_flag', safe((req: Request, res: Response) => {
+    const lines = db.prepare(`
+    SELECT w.*, 
+      CASE WHEN EXISTS (
+        SELECT 1 FROM assembly_line_workstations WHERE workstation_id = w.id
+      ) THEN 1 ELSE 0 END as has_assembly_lines
+    FROM workstations w
+  `).all();
+    res.json(lines);
+}));
+
 
 // assembly line management endpoints
 
