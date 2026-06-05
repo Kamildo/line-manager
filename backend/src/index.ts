@@ -19,5 +19,4 @@ app.use(authRouter);
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
-    console.log(`Version: ${VERSION}`);
 });
