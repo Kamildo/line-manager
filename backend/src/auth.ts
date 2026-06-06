@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { users } from './users';
+import { isOnline } from './database';
 
 const router = Router();
 
@@ -33,6 +34,7 @@ router.post('/api/auth/login', (req: Request, res: Response) => {
 
 
 export const requireAuth = (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (isOnline) { next(); return; }
     const header = req.headers.authorization;
     const token = header?.startsWith('Bearer ') ? header.split(' ')[1] : null;
     if (!token) { res.status(401).json({ error: 'No token' }); return; }
@@ -44,6 +46,7 @@ export const requireAuth = (req: AuthRequest, res: Response, next: NextFunction)
     }
 };
 export const requireAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (isOnline) { next(); return; }
     requireAuth(req, res, () => {
         if (req.user?.role !== 'admin') {
             res.status(403).json({ error: 'Admin only' }); return;

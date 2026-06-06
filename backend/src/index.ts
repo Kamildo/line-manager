@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { initDb } from './database';
+import { initDb, getHealth } from './database';
 import queries from './queries';
 import authRouter from './auth';
 
@@ -19,4 +19,8 @@ app.use(authRouter);
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
+});
+
+app.get('/health', (req, res) => {
+    res.json(getHealth());
 });

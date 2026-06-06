@@ -8,7 +8,13 @@ export  class AuthService {
   private token: string | null = null;
   private role: string | null = null;
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient, private router: Router)
+  {
+    if (environment.isOnline) {
+      this.token = 'online';
+      this.role = 'admin';
+    }
+  }
 
   login(username: string, password: string) {
     return this.http.post<{ token: string; role: string }>(
@@ -33,4 +39,9 @@ export  class AuthService {
     this.role = null;
     this.router.navigate(['/login']);
   }
+
+  checkHealth() {
+    return this.http.get<{ db: boolean }>(`${environment.apiUrl}/health`);
+  }
+
 }

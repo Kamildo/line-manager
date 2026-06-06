@@ -123,7 +123,11 @@ export function seedTestData() {
     assignments.forEach(([l, w, o]) => assign.run(l, w, o));
 }
 
-
-
+export function getHealth() {
+    return {
+        db: isOnline ? true : fs.existsSync(dbPath)
+    };
+}
+export { isOnline };
 
 export default db;

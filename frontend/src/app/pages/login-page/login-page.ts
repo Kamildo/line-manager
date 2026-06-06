@@ -26,8 +26,17 @@ export class LoginPage {
     this.auth.login(this.username, this.password).subscribe({
       next: (res) => {
         this.auth.setAuth(res.token, res.role);
-        this.router.navigate(['/assignments']);
-      },
+        this.auth.checkHealth().subscribe({
+        next: (health:{ db: boolean }) => {
+            if (health.db) {
+              this.router.navigate(['/assignments']);
+            } else {
+              this.router.navigate(['/settings']);
+            }
+          },  
+          error: () => this.router.navigate(['/settings'])
+        });
+      },  
       error: () => {
         this.error = 'Invalid credentials';
       }
