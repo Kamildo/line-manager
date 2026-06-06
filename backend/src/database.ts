@@ -2,40 +2,80 @@ import Database, { Database as DatabaseType } from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 
-const dbPath = path.join(__dirname, '../data/app.db');
 const isOnline = process.env.RENDER === 'true';
-//const isOnline = true // for debugging without deploying to render, will use in-memory db
-//const isOnline = false;// for debugging
-const db: DatabaseType = isOnline
-    ? new Database(':memory:')
-    : (() => {
-        if (!fs.existsSync(dbPath)) {
-            // TODO: Scenario 3 - no DB found, show setup screen
-            // TODO: Scenario 4 - allow custom path
-            console.warn('No database file found at', dbPath);
-            console.warn('Creating new database with test data...');
-            fs.mkdirSync(path.dirname(dbPath), { recursive: true });
-            return new Database(dbPath);
-        }
-        return new Database(dbPath);
-    })();
-export function initDb(withTestData = false) {
+//database path
+const defaultPath = path.join(__dirname, '../data/app.db');
+const configPath = path.join(__dirname, '../data/config.json');
 
-    if (!isOnline) {
-        return; //for now skip todo change when making scenario 3 and 4
+const config = loadConfig();
+let dbPath = config.dbPath ?? defaultPath;
+//let db: DatabaseType = openDb(dbPath);
+const dbRef: { instance: DatabaseType } = { instance: openDb(dbPath) };
+function loadConfig(): { dbPath?: string } {
+    if (!fs.existsSync(configPath)) return {};
+    return JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+}
+function saveConfig(config: { dbPath: string }) {
+    fs.mkdirSync(path.dirname(configPath), { recursive: true });
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+}
+
+export function reconfigure(newPath: string): { message: string; dbPath: string } {
+    if (!newPath.endsWith('.db')) throw new Error('Path must end with .db');
+    dbRef.instance.close();
+    dbRef.instance = openDb(newPath);
+    dbPath = newPath;
+    saveConfig({ dbPath: newPath });
+    return { message: 'Path updated', dbPath: newPath };
+}
+export function resetToDefaultPath(): { message: string; dbPath: string } {
+    dbRef.instance.close();
+    dbPath = defaultPath;
+    dbRef.instance = openDb(dbPath);
+    if (fs.existsSync(configPath)) fs.unlinkSync(configPath);
+    return { message: 'Restored to default path', dbPath: defaultPath };
+}
+
+
+
+function openDb(databasePath: string): DatabaseType {
+    if (isOnline) return new Database(':memory:');
+    if (!fs.existsSync(databasePath)) {
+        fs.mkdirSync(path.dirname(databasePath), { recursive: true });
     }
+    return new Database(databasePath);
+}
+
+export function getHealth() {
+    const dbExists = isOnline ? true : fs.existsSync(dbPath);
+    const hasTables = dbExists && !isOnline
+        ? (dbRef.instance.prepare("SELECT count(*) as c FROM sqlite_master WHERE type='table'").get() as { c: number }).c > 0
+        : true;
+
+    return {
+        db: dbExists && hasTables,
+        dbPath: isOnline || (dbPath === defaultPath ? 'default' : dbPath)
+    };
+}
+
+export { isOnline };
+
+
+export { dbRef as db };
+
+//data base creaction
+export function initDb(withTestData = false) {
     console.log(`Initializing database... isOnline: ${isOnline} 'dbPath:', ${dbPath}`);
-    db.pragma('foreign_keys = ON');
+    dbRef.instance.pragma('foreign_keys = ON');
 
-
-    db.exec(`
+    dbRef.instance.exec(`
     CREATE TABLE IF NOT EXISTS products (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL
     );
   `);
 
-    db.exec(`
+    dbRef.instance.exec(`
     CREATE TABLE IF NOT EXISTS assembly_lines (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -45,7 +85,7 @@ export function initDb(withTestData = false) {
     );
   `);
 
-    db.exec(`
+    dbRef.instance.exec(`
     CREATE TABLE IF NOT EXISTS workstations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -54,7 +94,7 @@ export function initDb(withTestData = false) {
     );
   `);
 
-    db.exec(`
+    dbRef.instance.exec(`
   CREATE TABLE IF NOT EXISTS assembly_line_workstations (
     assembly_line_id INTEGER NOT NULL,
     workstation_id INTEGER NOT NULL,
@@ -68,13 +108,13 @@ export function initDb(withTestData = false) {
     if (withTestData) seedTestData();
 }
 export function seedTestData() {
-    const insertProduct = db.prepare('INSERT INTO products (name) VALUES (?)');
+    const insertProduct = dbRef.instance.prepare('INSERT INTO products (name) VALUES (?)');
     const products = ['8DAB', '8DJH', 'Simosec', 'NXPlus C'].map(n => {
         const result = insertProduct.run(n);
         return result.lastInsertRowid;
     });
 
-    const insertLine = db.prepare('INSERT INTO assembly_lines (name, active, product_id) VALUES (?, ?, ?)');
+    const insertLine = dbRef.instance.prepare('INSERT INTO assembly_lines (name, active, product_id) VALUES (?, ?, ?)');
     const lines = [
         { name: 'Convey line', active: 1, product: products[0] },
         { name: 'Manual line', active: 1, product: products[1] },
@@ -86,7 +126,7 @@ export function seedTestData() {
         return result.lastInsertRowid;
     });
 
-    const insertWs = db.prepare('INSERT INTO workstations (name, short_name, pc_name) VALUES (?, ?, ?)');
+    const insertWs = dbRef.instance.prepare('INSERT INTO workstations (name, short_name, pc_name) VALUES (?, ?, ?)');
     const workstations = [
         { name: 'Laser welding', short_name: 'LW', pc_name: 'PC-LW-01' },
         { name: 'Manual welding', short_name: 'MW', pc_name: 'PC-MW-01' },
@@ -104,7 +144,7 @@ export function seedTestData() {
     });
 
     // ws index: 0=LW,1=MW,2=DA,3=VDT,4=LT,5=HV,6=FI,7=FA,8=TST,9=DSP
-    const assign = db.prepare('INSERT INTO assembly_line_workstations (assembly_line_id, workstation_id, order_index) VALUES (?, ?, ?)');
+    const assign = dbRef.instance.prepare('INSERT INTO assembly_line_workstations (assembly_line_id, workstation_id, order_index) VALUES (?, ?, ?)');
     const assignments = [
         [lines[0], workstations[7], 1], // Convey:         Frame assembly
         [lines[0], workstations[2], 2], // Convey:         Drive assembly
@@ -122,12 +162,3 @@ export function seedTestData() {
     ];
     assignments.forEach(([l, w, o]) => assign.run(l, w, o));
 }
-
-export function getHealth() {
-    return {
-        db: isOnline ? true : fs.existsSync(dbPath)
-    };
-}
-export { isOnline };
-
-export default db;

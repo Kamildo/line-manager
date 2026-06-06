@@ -42,7 +42,7 @@ export  class AuthService {
   }
 
   checkHealth() {
-    return this.http.get<{ db: boolean }>(`${this.configService.apiUrl}/health`);
+    return this.http.get<{ db: boolean, dbPath: string }>(`${this.configService.apiUrl}/health`);
   }
 
 }
