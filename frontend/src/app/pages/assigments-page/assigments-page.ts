@@ -2,7 +2,7 @@ import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { environment } from '../../../environments/environment';
+import { ConfigService } from '../../services/config.service';
 import { AuthService } from '../../services/auth.service';
 interface Product { id: number; name: string; }
 interface AssemblyLine { id: number; name: string; product_id: number | null; }
@@ -39,14 +39,14 @@ export class AssigmentsPage {
   pendingALSwitch: number | null = null;
 
 
-  constructor(public auth: AuthService) { }
+  constructor(public auth: AuthService, private configService: ConfigService) { }
 
   ngOnInit() {
-    this.http.get<Product[]>(`${environment.apiUrl}/api/products`).subscribe({
+    this.http.get<Product[]>(`${this.configService.apiUrl}/api/products`).subscribe({
       next: (data) => { this.products = data; this.cdr.markForCheck(); },
       error: (e) => console.error('products:', e)
     });
-    this.http.get<AssemblyLine[]>(`${environment.apiUrl}/api/assembly_lines`).subscribe({
+    this.http.get<AssemblyLine[]>(`${this.configService.apiUrl}/api/assembly_lines`).subscribe({
       next: (data) => { this.assemblyLines = data; this.cdr.markForCheck(); },
       error: (e) => console.error('assembly_lines:', e)
     });
@@ -95,7 +95,7 @@ export class AssigmentsPage {
       al_ids: this.pendingAL
     };
   //  console.log('sending:', JSON.stringify(payload));
-    this.http.put(`${environment.apiUrl}/api/assembly_lines/assign-products`, payload).subscribe({
+    this.http.put(`${this.configService.apiUrl}/api/assembly_lines/assign-products`, payload).subscribe({
       next: () => {
      //   console.log('success');
         this.assemblyLines = this.assemblyLines.map(al => {
@@ -127,7 +127,7 @@ export class AssigmentsPage {
   doSelectAL(id: number) {
     this.selectedAL = id;
     this.pendingChangesAL = false;
-    this.http.get<Workstation[]>(`${environment.apiUrl}/api/assembly_lines/${id}/workstations`).subscribe({
+    this.http.get<Workstation[]>(`${this.configService.apiUrl}/api/assembly_lines/${id}/workstations`).subscribe({
       next: (data) => {
         this.assignedWS = data;
         this.savedAssignedWS = [...data];
@@ -135,7 +135,7 @@ export class AssigmentsPage {
       },
       error: (e) => console.error('assigned ws:', e)
     });
-    this.http.get<Workstation[]>(`${environment.apiUrl}/api/assembly_lines/${id}/workstations/unassigned`).subscribe({
+    this.http.get<Workstation[]>(`${this.configService.apiUrl}/api/assembly_lines/${id}/workstations/unassigned`).subscribe({
       next: (data) => {
         this.unassignedWS = data;
         this.savedUnassignedWS = [...data];
@@ -181,7 +181,7 @@ export class AssigmentsPage {
       order_index: index + 1
     }));
     console.log('sending:', JSON.stringify(payload));
-    this.http.put(`${environment.apiUrl}/api/assembly_lines/${this.selectedAL}/workstations`, payload).subscribe({
+    this.http.put(`${this.configService.apiUrl}/api/assembly_lines/${this.selectedAL}/workstations`, payload).subscribe({
       next: () => {
         this.savedAssignedWS = [...this.assignedWS];
         this.savedUnassignedWS = [...this.unassignedWS];

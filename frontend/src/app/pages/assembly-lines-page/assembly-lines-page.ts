@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { environment } from '../../../environments/environment';
+import { ConfigService } from '../../services/config.service';
 import { AuthService } from '../../services/auth.service';
 // ─── Models ──────────────────────────────────────────────────────────────────
 
@@ -65,7 +65,7 @@ export class AssemblyLinesPage implements OnInit {
   filters: Filters = { name: '', productName: '', active: null, hasAssigned: null };
   editForm: EditForm = { name: '', active: true, productId: null };
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, public auth: AuthService) { }
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, public auth: AuthService, private configService: ConfigService) { }
 
   ngOnInit(): void {
     this.loadInitialData();
@@ -74,12 +74,12 @@ export class AssemblyLinesPage implements OnInit {
   // ── Data ───────────────────────────────────────────────────────────────────
 
   private loadInitialData(): void {
-    this.http.get<Product[]>(`${environment.apiUrl}/api/products`).subscribe({
+    this.http.get<Product[]>(`${this.configService.apiUrl}/api/products`).subscribe({
       next: (data) => { this.products = data; this.cdr.markForCheck(); },
       error: (e) => console.error('products:', e),
     });
 
-    this.http.get<AssemblyLine[]>(`${environment.apiUrl}/api/assembly_lines_with_workstation_flag`).subscribe({
+    this.http.get<AssemblyLine[]>(`${this.configService.apiUrl}/api/assembly_lines_with_workstation_flag`).subscribe({
       next: (data) => {
         this.allLines = data;
         this.applyFilters();
@@ -90,7 +90,7 @@ export class AssemblyLinesPage implements OnInit {
   }
 
   private reloadLines(selectId?: number): void {
-    this.http.get<AssemblyLine[]>(`${environment.apiUrl}/api/assembly_lines_with_workstation_flag`).subscribe({
+    this.http.get<AssemblyLine[]>(`${this.configService.apiUrl}/api/assembly_lines_with_workstation_flag`).subscribe({
       next: (data) => {
         this.allLines = data;
         this.applyFilters();
@@ -105,7 +105,7 @@ export class AssemblyLinesPage implements OnInit {
   }
 
   private loadWorkstations(lineId: number): void {
-    this.http.get<WorkstationWithOrder[]>(`${environment.apiUrl}/api/assembly_lines/${lineId}/workstations`).subscribe({
+    this.http.get<WorkstationWithOrder[]>(`${this.configService.apiUrl}/api/assembly_lines/${lineId}/workstations`).subscribe({
       next: (data) => { this.selectedWorkstations = data; this.cdr.markForCheck(); },
       error: (e) => console.error('workstations:', e),
     });
@@ -153,7 +153,7 @@ export class AssemblyLinesPage implements OnInit {
       return;
     }
     const body = { name: this.editForm.name, active: this.editForm.active, product_id: null };
-    this.http.post<AssemblyLine>(`${environment.apiUrl}/api/assembly_lines`, body).subscribe({
+    this.http.post<AssemblyLine>(`${this.configService.apiUrl}/api/assembly_lines`, body).subscribe({
       next: () => {
         this.selectedLine = null;
         this.selectedWorkstations = [];
@@ -169,7 +169,7 @@ export class AssemblyLinesPage implements OnInit {
     console.log('created:', 'start');
      if (this.isEditing && this.selectedLine) {
       const id = this.selectedLine.id;
-      this.http.put(`${environment.apiUrl}/api/assembly_lines/${id}`, body).subscribe({
+      this.http.put(`${this.configService.apiUrl}/api/assembly_lines/${id}`, body).subscribe({
         next: () => {
           this.isEditing = false;
           this.reloadLines(id);
@@ -185,7 +185,7 @@ export class AssemblyLinesPage implements OnInit {
       if (!confirm(`Assemly line "${this.selectedLine.name}" is assigned to ${this.selectedWorkstations.length} workstations. Do you wish to continue?`)) return;
     }
     else if (!confirm(`Delete "${this.selectedLine.name}"?`)) return;
-    this.http.delete(`${environment.apiUrl}/api/assembly_lines/workstations_assembly_line_unassign_all_and_delete/${this.selectedLine.id}`).subscribe({
+    this.http.delete(`${this.configService.apiUrl}/api/assembly_lines/workstations_assembly_line_unassign_all_and_delete/${this.selectedLine.id}`).subscribe({
     next: () => {
         this.selectedLine = null;
         this.selectedWorkstations = [];

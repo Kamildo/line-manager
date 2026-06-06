@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { ConfigService } from './config.service'; 
 
 @Injectable({ providedIn: 'root' })
 export  class AuthService {
   private token: string | null = null;
   private role: string | null = null;
 
-  constructor(private http: HttpClient, private router: Router)
+  constructor(private http: HttpClient, private router: Router, private configService: ConfigService)
   {
     if (environment.isOnline) {
       this.token = 'online';
@@ -18,7 +19,7 @@ export  class AuthService {
 
   login(username: string, password: string) {
     return this.http.post<{ token: string; role: string }>(
-      `${environment.apiUrl}/api/auth/login`,
+      `${this.configService.apiUrl}/api/auth/login`,
       { username, password }
     );
   }
@@ -41,7 +42,7 @@ export  class AuthService {
   }
 
   checkHealth() {
-    return this.http.get<{ db: boolean }>(`${environment.apiUrl}/health`);
+    return this.http.get<{ db: boolean }>(`${this.configService.apiUrl}/health`);
   }
 
 }

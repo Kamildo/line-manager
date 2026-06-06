@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { environment } from '../../../environments/environment';
+import { ConfigService } from '../../services/config.service';
 import { AuthService } from '../../services/auth.service';
 // ─── Models ──────────────────────────────────────────────────────────────────
 
@@ -33,7 +33,7 @@ export class ProductsPage implements OnInit {
   filters: Filters = { name: '' }
   editForm: EditForm = { name: '' }
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, public auth: AuthService) { }
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, public auth: AuthService, private configService: ConfigService) { }
 
   ngOnInit(): void {
     this.loadInitialData();
@@ -41,7 +41,7 @@ export class ProductsPage implements OnInit {
   // ── Data ───────────────────────────────────────────────────────────────────
 
   private loadInitialData(): void {
-    this.http.get<Product[]>(`${environment.apiUrl}/api/products`).subscribe({
+    this.http.get<Product[]>(`${this.configService.apiUrl}/api/products`).subscribe({
       next: (data) => {
         this.allProducts = data;
         this.cdr.markForCheck();
@@ -86,7 +86,7 @@ export class ProductsPage implements OnInit {
       return;
     }
     const body = { name: this.editForm.name };
-    this.http.post<Product>(`${environment.apiUrl}/api/products`, body).subscribe({
+    this.http.post<Product>(`${this.configService.apiUrl}/api/products`, body).subscribe({
       next: () => {
         this.selectedProduct = null;
         this.editForm = { name: '' };
@@ -100,7 +100,7 @@ export class ProductsPage implements OnInit {
     const body = { name: this.editForm.name };
     if (this.isEditing && this.selectedProduct) {
       const id = this.selectedProduct.id;
-      this.http.put(`${environment.apiUrl}/api/products/${id}`, body).subscribe({
+      this.http.put(`${this.configService.apiUrl}/api/products/${id}`, body).subscribe({
         next: () => {
           this.isEditing = false;
           this.loadInitialData();
@@ -113,7 +113,7 @@ export class ProductsPage implements OnInit {
   onDelete(): void {
     if (!this.selectedProduct) return;
     if (!confirm(`Delete "${this.selectedProduct.name}"?`)) return;
-    this.http.delete(`${environment.apiUrl}/api/products/${this.selectedProduct.id}`).subscribe({
+    this.http.delete(`${this.configService.apiUrl}/api/products/${this.selectedProduct.id}`).subscribe({
       next: () => {
         this.selectedProduct = null;
         this.editForm = { name: '' };

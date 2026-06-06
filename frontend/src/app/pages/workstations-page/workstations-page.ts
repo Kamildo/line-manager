@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { environment } from '../../../environments/environment';
+import { ConfigService } from '../../services/config.service';
 import { AuthService } from '../../services/auth.service';
 // ─── Models ──────────────────────────────────────────────────────────────────
 
@@ -50,7 +50,7 @@ export class WorkstationsPage implements OnInit {
   filters: Filters = { name: '', short_name: '', pc_name: '', hasAssigned: null }
   editForm: EditForm = { name: '', short_name: '', pc_name: '' }
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, public auth: AuthService) { }
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, public auth: AuthService, private configService: ConfigService) { }
 
   ngOnInit(): void {
     this.loadInitialData();
@@ -58,7 +58,7 @@ export class WorkstationsPage implements OnInit {
   // ── Data ───────────────────────────────────────────────────────────────────
 
   private loadInitialData(): void {
-    this.http.get<Workstation[]>(`${environment.apiUrl}/api/workstations_with_assembly_lines_flag`).subscribe({
+    this.http.get<Workstation[]>(`${this.configService.apiUrl}/api/workstations_with_assembly_lines_flag`).subscribe({
       next: (data) => {
         console.log('workstations with lines flag:', data);
         this.allWorkstation = data;
@@ -70,7 +70,7 @@ export class WorkstationsPage implements OnInit {
   }
   //'/api/workstations/:id/assembly_lines'
   private loadAssemlyLines(workstationId: number): void {
-    this.http.get<AssemblyLine[]>(`${environment.apiUrl}/api/workstations/${workstationId}/assembly_lines`).subscribe({
+    this.http.get<AssemblyLine[]>(`${this.configService.apiUrl}/api/workstations/${workstationId}/assembly_lines`).subscribe({
       next: (data) => { this.selectedLines = data; this.cdr.markForCheck(); },
       error: (e) => console.error('assembly lines:', e),
     });
@@ -114,7 +114,7 @@ export class WorkstationsPage implements OnInit {
       return;
     }
     const body = { name: this.editForm.name, short_name: this.editForm.short_name, pc_name: this.editForm.pc_name };
-    this.http.post<Workstation>(`${environment.apiUrl}/api/workstations`, body).subscribe({
+    this.http.post<Workstation>(`${this.configService.apiUrl}/api/workstations`, body).subscribe({
       next: () => {
         this.selectedWorkstation = null;
         this.editForm = { name: '', short_name: '', pc_name: '' };
@@ -128,7 +128,7 @@ export class WorkstationsPage implements OnInit {
     const body = { name: this.editForm.name, short_name: this.editForm.short_name, pc_name: this.editForm.pc_name };
     if (this.isEditing && this.selectedWorkstation) {
       const id = this.selectedWorkstation.id;
-      this.http.put(`${environment.apiUrl}/api/workstations/${id}`, body).subscribe({
+      this.http.put(`${this.configService.apiUrl}/api/workstations/${id}`, body).subscribe({
         next: () => {
           this.isEditing = false;
           this.loadInitialData();
@@ -146,7 +146,7 @@ export class WorkstationsPage implements OnInit {
       if (!confirm(`Workstation "${this.selectedWorkstation.name}" is assigned to ${this.selectedLines.length} assembly lines. Do you wish to continue?`)) return;
     }
     else if (!confirm(`Delete "${this.selectedWorkstation.name}"?`)) return;
-    this.http.delete(`${environment.apiUrl}/api/workstations/workstations_assembly_line_unassign_all_and_delete/${this.selectedWorkstation.id}`).subscribe({
+    this.http.delete(`${this.configService.apiUrl}/api/workstations/workstations_assembly_line_unassign_all_and_delete/${this.selectedWorkstation.id}`).subscribe({
     next: () => {
         this.selectedWorkstation = null;
         this.editForm = { name: '', short_name: '', pc_name: '' };

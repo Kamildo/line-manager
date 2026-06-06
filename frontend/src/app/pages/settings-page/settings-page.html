@@ -1,1 +1,74 @@
-<p>settings-page works!</p>
+<div class="settings-page">
+  <h2>Settings</h2>
+
+  <!-- ONLINE MODE -->
+  <section *ngIf="isOnline">
+    <h3>Backend</h3>
+    <p>Running in online mode. Configuration is read-only.</p>
+    <label>Backend URL</label>
+    <input type="text" [value]="backendUrl" readonly />
+  </section>
+
+  <!-- OFFLINE GUEST -->
+  <section *ngIf="!isOnline && role === 'guest'">
+    <p>Settings not available for guest users. Log in as user or admin.</p>
+  </section>
+
+  <!-- OFFLINE USER + ADMIN -->
+  <section *ngIf="!isOnline && (role === 'user' || role === 'admin')">
+    <h3>Backend URL</h3>
+    <p>Current: <strong>{{ currentApiUrl }}</strong></p>
+
+    <label>New URL</label>
+    <input type="text"
+           [(ngModel)]="newApiUrl"
+           placeholder="e.g. http://localhost:3000" />
+
+    <button (click)="testUrl()" [disabled]="loading || !newApiUrl">
+      {{ loading ? 'Testing…' : 'Test' }}
+    </button>
+
+    <button (click)="saveUrl()" [disabled]="!urlTestPassed">
+      Save URL
+    </button>
+
+    <button (click)="resetUrl()" [disabled]="!hasCustomUrl">
+      Reset to Default
+    </button>
+
+    <p *ngIf="urlStatus" [style.color]="urlTestPassed ? 'green' : 'red'">
+      {{ urlStatus }}
+    </p>
+    <p *ngIf="urlTestPassed && !urlSaved">
+      ✓ Connection OK — click Save URL to apply.
+    </p>
+    <p *ngIf="urlSaved">
+      ✓ URL saved. All requests now go to <strong>{{ currentApiUrl }}</strong>.
+    </p>
+
+    <hr />
+
+    <h3>Connection Status</h3>
+    <button (click)="checkConnection()" [disabled]="loading">
+      {{ loading ? 'Checking…' : 'Check Current Connection' }}
+    </button>
+
+    <p *ngIf="connectionStatus !== null" [style.color]="connectionStatus ? 'green' : 'red'">
+      {{ connectionStatus ? '✓ Connected — database OK' : '✗ Connection failed' }}
+    </p>
+    <p *ngIf="errorMsg" style="color:red">{{ errorMsg }}</p>
+  </section>
+
+  <!-- OFFLINE ADMIN ONLY -->
+  <section *ngIf="!isOnline && role === 'admin'">
+    <h3>Reset Database</h3>
+    <p>Warning: this will wipe all current data.</p>
+
+    <button (click)="resetDb('empty')" [disabled]="loading">Reset (empty)</button>
+    <button (click)="resetDb('seed')" [disabled]="loading">Reset (with test data)</button>
+
+    <p *ngIf="resetStatus" [style.color]="resetError ? 'red' : 'green'">
+      {{ resetStatus }}
+    </p>
+  </section>
+</div>
