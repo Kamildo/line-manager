@@ -1,6 +1,6 @@
 @echo off
 echo ============================================
-echo  Line Manager - First Time Setup
+echo  Assembly Line Manager - First Time Setup
 echo ============================================
 echo.
 echo This will:

@@ -1,5 +1,5 @@
 @echo off
-echo Starting Line Manager...
+echo Starting Assembly Line Manager...
 
 start cmd /k "cd backend && npm run dev"
 start cmd /k "cd frontend && ng serve --configuration development"

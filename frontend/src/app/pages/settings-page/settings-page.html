@@ -4,7 +4,7 @@
   <!-- ONLINE MODE -->
   <section *ngIf="isOnline">
     <h3>Backend</h3>
-    <p>Running in online mode. Configuration is read-only.</p>
+    <p>Running in online mode. Changing settings is not available.</p>
     <label>Backend URL</label>
     <input type="text" [value]="backendUrl" readonly />
   </section>
@@ -57,8 +57,8 @@
     <ng-container *ngIf="connectionStatus === false && !errorMsg">
       <p>No database found at current path. Create one:</p>
       <div class="settings-actions">
-        <button class="btn btn--secondary" (click)="initDb('empty')" [disabled]="loading">Create empty DB</button>
-        <button class="btn btn--primary" (click)="initDb('seed')" [disabled]="loading">Create with test data</button>
+        <button class="btn btn--secondary" (click)="initDb('empty')" [disabled]="loading">Create empty data base</button>
+        <button class="btn btn--primary" (click)="initDb('seed')" [disabled]="loading">Create data base with test data</button>
       </div>
       <p *ngIf="initStatus" [style.color]="initError ? 'settings-status settings-status--error' : 'settings-status settings-status--ok'">{{ initStatus }}</p>
     </ng-container>
