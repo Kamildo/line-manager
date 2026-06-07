@@ -28,4 +28,12 @@
       <button class="submit-btn" (click)="login()">LOG IN</button>
     </div>
   </div>
+
+  <<div class="url-fallback" *ngIf="showUrlField">
+  <p>Backend unreachable. Check if it is running or enter a different URL:</p>
+  <p>Current setting: <strong>{{ currentUrl }}</strong></p>
+  <input [(ngModel)]="tempUrl" type="text" placeholder="http://localhost:3000" />
+  <button (click)="applyTempUrl()">Apply & Retry</button>
+</div>
+
 </div>

@@ -21,13 +21,15 @@
     <p>Current: <strong>{{ currentApiUrl }}</strong></p>
 
     <label>New URL</label>
-    <input type="text" [(ngModel)]="newApiUrl" placeholder="e.g. http://localhost:3000" />
+    <input class="settings-input" type="text" [(ngModel)]="newApiUrl" placeholder="e.g. http://localhost:3000" />
 
-    <button (click)="testUrl()" [disabled]="loading || !newApiUrl">
-      {{ loading ? 'Testing…' : 'Test' }}
-    </button>
-    <button (click)="saveUrl()" [disabled]="!urlTestPassed">Save URL</button>
-    <button (click)="resetUrl()" [disabled]="!hasCustomUrl">Reset to Default</button>
+    <div class="settings-actions">
+      <button class="btn btn--secondary" (click)="testUrl()" [disabled]="loading || !newApiUrl">
+        {{ loading ? 'Testing…' : 'Test' }}
+      </button>
+      <button class="btn btn--primary" (click)="saveUrl()" [disabled]="!urlTestPassed">Save URL</button>
+      <button class="btn btn--ghost" (click)="resetUrl()" [disabled]="!hasCustomUrl">Reset to Default</button>
+    </div>
 
     <p *ngIf="urlStatus" [style.color]="urlTestPassed ? 'green' : 'red'">{{ urlStatus }}</p>
     <p *ngIf="urlTestPassed && !urlSaved">Click Save URL to apply.</p>
@@ -36,12 +38,14 @@
     <hr />
 
     <h3>Connection Status</h3>
-    <button (click)="checkConnection()" [disabled]="loading">
-      {{ loading ? 'Checking…' : 'Check Connection' }}
-    </button>
+    <div class="settings-actions">
+      <button class="btn btn--secondary" (click)="checkConnection()" [disabled]="loading">
+        {{ loading ? 'Checking…' : 'Check Connection' }}
+      </button>
+    </div>
 
     <ng-container *ngIf="connectionStatus !== null">
-      <p [style.color]="connectionStatus ? 'green' : 'red'">
+      <p *ngIf="urlStatus" [class]="urlTestPassed ? 'settings-status settings-status--ok' : 'settings-status settings-status--error'">
         {{ connectionStatus ? '✓ Connected' : '✗ No database found' }}
       </p>
       <p *ngIf="dbPath">DB path: <strong>{{ dbPath }}</strong></p>
@@ -52,9 +56,11 @@
     <!-- DB missing — user + admin can init -->
     <ng-container *ngIf="connectionStatus === false && !errorMsg">
       <p>No database found at current path. Create one:</p>
-      <button (click)="initDb('empty')" [disabled]="loading">Create empty DB</button>
-      <button (click)="initDb('seed')" [disabled]="loading">Create with test data</button>
-      <p *ngIf="initStatus" [style.color]="initError ? 'red' : 'green'">{{ initStatus }}</p>
+      <div class="settings-actions">
+        <button class="btn btn--secondary" (click)="initDb('empty')" [disabled]="loading">Create empty DB</button>
+        <button class="btn btn--primary" (click)="initDb('seed')" [disabled]="loading">Create with test data</button>
+      </div>
+      <p *ngIf="initStatus" [style.color]="initError ? 'settings-status settings-status--error' : 'settings-status settings-status--ok'">{{ initStatus }}</p>
     </ng-container>
 
   </section>
@@ -66,12 +72,14 @@
     <p>Current path: <strong>{{ dbPath ?? '…' }}</strong></p>
 
     <label>New DB Path</label>
-    <input type="text" [(ngModel)]="newDbPath" placeholder="e.g. backend/data/custom.db" />
+    <input class="settings-input" type="text" [(ngModel)]="newDbPath" placeholder="e.g. backend/data/custom.db" />
 
-    <button (click)="reconfigureDb()" [disabled]="loading || !newDbPath">Apply Path</button>
-    <button (click)="resetDbPath()" [disabled]="loading">Restore Default Path</button>
+    <div class="settings-actions">
+      <button class="btn btn--primary" (click)="reconfigureDb()" [disabled]="loading || !newDbPath">Apply Path</button>
+      <button class="btn btn--ghost" (click)="resetDbPath()" [disabled]="loading">Restore Default Path</button>
+    </div>
 
-    <p *ngIf="reconfigureStatus" [style.color]="reconfigureError ? 'red' : 'green'">
+    <p *ngIf="reconfigureStatus" [style.color]="reconfigureError ? 'settings-status settings-status--error' : 'settings-status settings-status--ok'">
       {{ reconfigureStatus }}
     </p>
 

@@ -30,8 +30,7 @@ echo [1/3] Checking Angular CLI...
 call ng version > nul 2>&1
 if %errorlevel% equ 0 (
     echo Already installed. Skipping.
-) 
-else (
+) else (
     echo Installing Angular CLI...
     call npm install -g @angular/cli
     if %errorlevel% neq 0 (
@@ -45,8 +44,7 @@ echo.
 echo [2/3] Installing backend dependencies...
 if exist backend\node_modules (
     echo Already installed. Skipping.
-) 
-else (
+) else (
 cd backend
 call npm install
 if %errorlevel% neq 0 (
@@ -62,8 +60,7 @@ echo.
 echo [3/3] Installing frontend dependencies...
 if exist frontend\node_modules (
     echo Already installed. Skipping.
-) 
-else (
+) else (
 cd frontend
 call npm install
 if %errorlevel% neq 0 (
